@@ -32,7 +32,6 @@ void init()
 void frame()
 {
 	glViewport(0, 0, window_w, window_h);
-	glDepthRangef(-1, 1000);
 
 	float t = ((float) (SDL_GetTicks() % 1000))/1000;
 	r_clear(t, t, t, 1);

@@ -8,62 +8,6 @@
 #include <SDL_image.h>
 
 /*
- * helpers
- *
- */
-
-/* FIXME: lol */
-static unsigned nearest_pow2(unsigned x)
-{
-	unsigned y;
-	for (y = 1; y < x; y *= 2);
-	return y;
-}
-
-/* taken from Atis at https://forums.libsdl.org/viewtopic.php?p=32849 */
-static void
-surface_to_texture(SDL_Surface *img, unsigned *w, unsigned *h)
-{
-        /* OpenGL pixel format for destination surface. */
-        int bpp;
-        Uint32 Rmask, Gmask, Bmask, Amask;
-        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ABGR8888, &bpp, &Rmask,
-                                   &Gmask, &Bmask, &Amask);
-       
-        /* Create surface that will hold pixels passed into OpenGL. */
-        SDL_Surface *img_rgba8888 = SDL_CreateRGBSurface(0, img->w, img->h, bpp,
-                                                         Rmask, Gmask, Bmask, Amask);
-       
-        /*
-         * Disable blending for source surface. If this is not done, all
-         * destination surface pixels end up with crazy alpha values.
-         */
-        SDL_SetSurfaceAlphaMod(img, 0xFF);
-        SDL_SetSurfaceBlendMode(img, SDL_BLENDMODE_NONE);
-       
-        /* Blit to this surface, effectively converting the format. */
-        SDL_BlitSurface(img, NULL, img_rgba8888, NULL);
-
-        /* Store width and height as return values. */
-        assert(w && h);
-        *w = img->w;
-        *h = img->h;
-        unsigned pow_w = nearest_pow2(img->w);
-        unsigned pow_h = nearest_pow2(img->h);
-       
-        /*
-         * Create a blank texture with power-of-two dimensions. Then load
-         * converted image data into its lower left.
-         */
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pow_w, pow_h, 0,
-                     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img->w, img->h, GL_RGBA,
-                        GL_UNSIGNED_BYTE, img_rgba8888->pixels);
-       
-        SDL_FreeSurface(img_rgba8888);
-} 
-
-/*
  * read
  *
  */
@@ -192,7 +136,6 @@ GLuint CreateSimpleTexture2D( )
 
 void r_load_teh_model_texture(struct teh_model* x)
 {
-	unsigned w, h;
 	glEnable(GL_TEXTURE_2D);
 
 	x->texture_id = CreateSimpleTexture2D();
@@ -200,7 +143,7 @@ void r_load_teh_model_texture(struct teh_model* x)
 	glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
 	glGenTextures(1, &x->texture_id);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
-	surface_to_texture(x->texture, &w, &h);
+	r_surface_2_texture(x->texture);
 
 	/* NOTE: sem isso o model fica preto */
 	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -225,11 +168,6 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	v2_off = (const GLvoid*) teh_model_vbo_frame_vertex_off(x, f2);
 	tc_off = (const GLvoid*) teh_model_vbo_tex_coord_off(x);
 
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
@@ -246,13 +184,21 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, v2_off);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, tc_off);
 
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
 	glDrawArrays(GL_TRIANGLES, 0, 3 * x->triangle_c);
+
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 /*

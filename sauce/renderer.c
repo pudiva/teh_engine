@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "renderer.h"
 
 GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
@@ -115,6 +116,57 @@ void renderer_init()
 	r_color_loc = glGetUniformLocation(r_program_id, "color");
 
 	glEnable(GL_TEXTURE_2D);
+}
+
+/* c eh potencia d 2 */
+static bool is_pot(unsigned x)
+{
+	return ((x != 0) && !(x & (x - 1)));
+}
+
+/* adaptado do Atis <https://forums.libsdl.org/viewtopic.php?p=32849> */
+void r_surface_2_texture(SDL_Surface *img)
+{
+        /* OpenGL pixel format for destination surface. */
+        int bpp;
+        Uint32 Rmask, Gmask, Bmask, Amask;
+        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ABGR8888, &bpp, &Rmask,
+                                   &Gmask, &Bmask, &Amask);
+       
+        /* Create surface that will hold pixels passed into OpenGL. */
+        SDL_Surface *img_rgba8888 = SDL_CreateRGBSurface(0, img->w, img->h, bpp,
+                                                         Rmask, Gmask, Bmask, Amask);
+       
+        /*
+         * Disable blending for source surface. If this is not done, all
+         * destination surface pixels end up with crazy alpha values.
+         */
+        SDL_SetSurfaceAlphaMod(img, 0xFF);
+        SDL_SetSurfaceBlendMode(img, SDL_BLENDMODE_NONE);
+       
+        /* Blit to this surface, effectively converting the format. */
+        SDL_BlitSurface(img, NULL, img_rgba8888, NULL);
+
+	/* tenq c potencia d 2 */
+	assert (is_pot(img->w));
+	assert (is_pot(img->h));
+       
+        /*
+         * Create a blank texture with power-of-two dimensions. Then load
+         * converted image data into its lower left.
+         */
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, img->w, img->h, GL_RGBA,
+                        GL_UNSIGNED_BYTE, img_rgba8888->pixels);
+       
+        SDL_FreeSurface(img_rgba8888);
+}
+
+void r_load_texture(SDL_Surface* img)
+{
+	assert (is_pot(img->w));
+	assert (is_pot(img->h));
 }
 
 void renderer_fini()
