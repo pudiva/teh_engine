@@ -116,6 +116,12 @@ void renderer_init()
 	r_color_loc = glGetUniformLocation(r_program_id, "color");
 
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 }
 
 /* c eh potencia d 2 */

@@ -136,18 +136,13 @@ GLuint CreateSimpleTexture2D( )
 
 void r_load_teh_model_texture(struct teh_model* x)
 {
-	glEnable(GL_TEXTURE_2D);
-
 	x->texture_id = CreateSimpleTexture2D();
 
 	glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
 	glGenTextures(1, &x->texture_id);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
 	r_surface_2_texture(x->texture);
-
-	/* NOTE: sem isso o model fica preto */
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 /*
@@ -168,7 +163,6 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	v2_off = (const GLvoid*) teh_model_vbo_frame_vertex_off(x, f2);
 	tc_off = (const GLvoid*) teh_model_vbo_tex_coord_off(x);
 
-	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
 	glUniform1i(r_texture_sampler_loc, 0);
@@ -176,29 +170,11 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	glUniform1f(r_vertex_w_loc, w);
 	glBindBuffer(GL_ARRAY_BUFFER, x->vbo_id);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, v1_off);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, v2_off);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, tc_off);
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
 	glDrawArrays(GL_TRIANGLES, 0, 3 * x->triangle_c);
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glDisable(GL_TEXTURE_2D);
 }
 
 /*
