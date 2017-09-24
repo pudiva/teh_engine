@@ -18,10 +18,10 @@ void read_teh_model_vertices_stream(struct teh_model* x, FILE* fp)
 
 	fscanf(fp, "dota? =op\n");
 	fscanf(
-		fp,
-		"teh model has %d triangles and %d frames.\n",
-		&x->triangle_c,
-		&x->frame_c
+			fp,
+			"teh model has %d triangles and %d frames.\n",
+			&x->triangle_c,
+			&x->frame_c
 	      );
 
 	x->tex_coord_v = malloc(teh_model_tex_coord_sz(x));
@@ -82,7 +82,7 @@ void r_load_teh_model_vbo(struct teh_model* x)
 			teh_model_vbo_sz(x),
 			NULL,
 			GL_STATIC_DRAW
-			);
+		    );
 
 	glBufferSubData(
 			GL_ARRAY_BUFFER,
@@ -101,43 +101,8 @@ void r_load_teh_model_vbo(struct teh_model* x)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-GLuint CreateSimpleTexture2D( )
-{
-   // Texture object handle
-   GLuint textureId;
-   
-   // 2x2 Image, 3 bytes per pixel (R, G, B)
-   GLubyte pixels[4 * 3] =
-   {  
-      255,   0,   0, // Red
-        0, 255,   0, // Green
-        0,   0, 255, // Blue
-      255, 255,   0  // Yellow
-   };
-
-   // Use tightly packed data
-   glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
-
-   // Generate a texture object
-   glGenTextures ( 1, &textureId );
-
-   // Bind the texture object
-   glBindTexture ( GL_TEXTURE_2D, textureId );
-
-   // Load the texture
-   glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
-
-   // Set the filtering mode
-   glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-   glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-   return textureId;
-}
-
 void r_load_teh_model_texture(struct teh_model* x)
 {
-	x->texture_id = CreateSimpleTexture2D();
-
 	glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
 	glGenTextures(1, &x->texture_id);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
