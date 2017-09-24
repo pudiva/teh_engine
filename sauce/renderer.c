@@ -169,12 +169,6 @@ void r_surface_2_texture(SDL_Surface *img)
 	SDL_FreeSurface(img_rgba8888);
 }
 
-void r_load_texture(SDL_Surface* img)
-{
-	assert (is_pot(img->w));
-	assert (is_pot(img->h));
-}
-
 void renderer_fini()
 {
 	glDeleteProgram(r_program_id);
