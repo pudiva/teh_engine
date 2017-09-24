@@ -1,0 +1,124 @@
+@startuml;
+
+class TehMemry {
+	-- assets --
+	+model_c
+	+model_v
+	+pixmap_c
+	+pixmap_v
+	-- game --
+	+game
+	-- sdl --
+	+sdl_window_surface
+}
+
+TehMemry *-- "*" Model
+TehMemry *-- "*" Pixmap
+TehMemry *-- "1" Game
+
+class Pixmap {
+	+id
+	+name
+	__
+	+sdl_surface
+	+gl_tex_id
+}
+
+class Model {
+	+id
+	+name
+	-- vertices --
+	+vertex_c
+	+vertex_v
+	+gl_vertex_pointer
+	-- indices --
+	+index_c
+	+index_v
+	+gl_index_pointer
+	-- tex coords --
+	+tex_coord_c
+	+tex_coord_v
+	+gl_tex_coord_pointer
+	-- textures --
+	-tex_pixmap_name
+	+tex_pixmap_id
+}
+
+Model <|-- AniModel
+Model <|-- BspModel
+
+Model -- "1" Pixmap
+
+class AniModel {
+	-- vertices --
+	+vertex_frame_len
+	-- transitions --
+	+trans_t
+	+trans_c
+	+trans_v
+	-- sequences --
+	+seq_c
+	+seq_v
+}
+
+class Trans {
+	+vertex_off_1
+	+vertex_off_2
+	+w1
+	+w2
+}
+
+AniModel *-- "*" Trans
+
+class BspModel {
+	+node_c
+	+node_v
+	+root_id
+}
+
+class BspNode {
+	+is_leaf
+	+is_solid
+	+n
+	+h
+	+front_id
+	+back_id
+}
+
+BspModel *-- "1" BspNode
+BspNode *-- "0..2" BspNode
+
+class Game {
+	-- za_warudo --
+	+za_warudo
+	-- entities --
+	+genty_c
+	+genty_v
+}
+
+Game *-- "1" ZaWarudo
+Game *-- "*" Genty
+
+class ZaWarudo {
+}
+
+ZaWarudo -- "1" BspModel
+
+class Genty {
+	+name
+	+pos
+	+boxxy
+	-model_name
+	+model_id
+}
+
+Genty -- "1" AniModel
+
+class Controller {
+}
+
+class Renderer {
+	+sdl_surface
+}
+
+@enduml;
