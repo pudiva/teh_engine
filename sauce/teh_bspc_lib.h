@@ -44,8 +44,8 @@ union node
  *
  */
 #define TRI_POOL_LEN 10000
-extern struct tri tri_pool[TRI_POOL_LEN];
-extern unsigned long tri_pool_c;
+struct tri tri_pool[TRI_POOL_LEN];
+unsigned long tri_pool_c;
 
 struct tri* tri_alloc();
 int tri_shallow_split_score(struct tri* restrict x, float* restrict plane);
