@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include "teh_model.h"
-#include "teh_bspc_lib.h"
+#include "bspc.h"
 
 struct teh_model in;
 struct teh_model out;

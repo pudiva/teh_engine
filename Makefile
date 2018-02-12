@@ -56,7 +56,8 @@ OBJS := \
 	build/vec.o
 
 BSPC_OBJS := \
-	build/teh_bspc_lib.o
+	build/tri.o \
+	build/bspc.o \
 
 PRG_OBJS := \
 	build/check/check.o \
@@ -83,7 +84,7 @@ ALL_FILES := \
 all: $(PRGS)
 
 clean:
-	rm -f $(SHADERS) $(OBJS) $(PRG_OBJS) $(PRGS)
+	rm -f $(SHADERS) $(OBJS) $(BSPC_OBJS) $(PRG_OBJS) $(PRGS)
 
 check: build/check/check
 	$^
@@ -106,12 +107,13 @@ build/%.o: sauce/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # prgs
-build/teh_bspc: build/teh_bspc.o build/teh_bspc_lib.o $(OBJS)
+# FIXME: bspc ta dependendo de tudo
+build/teh_bspc: build/teh_bspc.o $(BSPC_OBJS) $(OBJS)
 build/teh_engine: build/teh_engine.o $(OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # checks
-build/check/check: build/check/check.o build/teh_bspc_lib.o $(OBJS)
+build/check/check: build/check/check.o $(BSPC_OBJS) $(OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -lcheck -o $@ $^
