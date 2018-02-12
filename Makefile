@@ -54,7 +54,8 @@ OBJS := \
 	build/renderer.o \
 	build/controller.o \
 	build/teh_model.o \
-	build/vec.o
+	build/vec.o \
+	build/assets.o \
 
 BSPC_OBJS := \
 	build/tri.o \
