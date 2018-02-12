@@ -35,7 +35,7 @@ void vec3_lerp(float w, const float* x, float* y)
 void vec3_cross(const float* restrict x, const float* restrict y, float* restrict z)
 {
 	z[0] = x[1]*y[2] - x[2]*y[1];
-	z[1] = x[0]*y[2] - x[2]*y[0];
+	z[1] = x[2]*y[0] - x[0]*y[2];
 	z[2] = x[0]*y[1] - x[1]*y[0];
 }
 
