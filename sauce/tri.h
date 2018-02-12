@@ -6,7 +6,7 @@
 /* NOTE: nomes curtos pq se nao fica tenso */
 struct tri
 {
-	bool used; /* TODO */
+	bool used;
 	float v[3][3];
 	float tc[3][2];
 	float p[4];

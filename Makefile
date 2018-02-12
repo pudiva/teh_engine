@@ -13,6 +13,7 @@ CFLAGS := \
 	`pkg-config sdl2 --cflags` \
 	`pkg-config SDL2_image --cflags` \
 	`pkg-config SDL2_mixer --cflags` \
+	`pkg-config libgvc --cflags` \
 	-std=c99 \
 	-Wall \
 	-pipe \
@@ -114,6 +115,9 @@ build/%.o: sauce/%.c
 # prgs
 # FIXME: bspc ta dependendo de tudo
 build/teh_bspc: build/teh_bspc.o $(BSPC_OBJS) $(OBJS)
+	mkdir -p `dirname $@`
+	$(LD) $(LDFLAGS) `pkg-config --libs libgvc` -o $@ $^
+
 build/teh_engine: build/teh_engine.o $(OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -o $@ $^

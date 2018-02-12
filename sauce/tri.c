@@ -168,7 +168,6 @@ void tri_split(void)
 	y[0] = NULL;
 	y[1] = NULL;
 	y[2] = NULL;
-	x->used = true;
 
 	if (n_splits == 0)
 	{
@@ -179,7 +178,7 @@ void tri_split(void)
 	{
 		ya = y[cmp[a]+1] = x;
 		yb = y[cmp[b]+1] = tri_alloc();
-		yb->used = true;
+		yb->used = x->used;
 
 		wa = (p[3] - h[a]) / (h[b] - h[a]);
 		wb = (p[3] - h[c]) / (h[a] - h[c]);
@@ -199,7 +198,7 @@ void tri_split(void)
 		{
 			/* caso 2 tem 3 triangulos */
 			yc = yb->next = tri_alloc();
-			yc->used = true;
+			yc->used = x->used;
 
 			vpick(yc->v, yc->tc, v, tc, 3, 2, 4, 3);
 			vec4_copy(x->p, yc->p);
