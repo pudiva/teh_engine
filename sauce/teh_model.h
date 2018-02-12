@@ -8,66 +8,34 @@
 
 struct teh_model
 {
-	unsigned triangle_c;
-	unsigned frame_c;
-	float (*tex_coord_v)[2];
-	float (*vertex_v)[3];
+	unsigned n_tris;
+	unsigned n_frames;
+	float (*texcoords)[3][2];
+	float (*tris)[3][3];
 
 	SDL_Surface* texture;
 
 	/* gl stuff */
 	GLuint vbo_id;
 	GLuint texture_id;
+
+	GLintptr vbo_texcoords_off;
+	GLintptr vbo_tris_off;
+	GLsizeiptr vbo_frame_size;
 };
 
 #define TEH_MODEL_FPS 24
 
-#define teh_model_frame_vertex_c(x) \
-	((x)->triangle_c * 3)
+void teh_model_read(struct teh_model* x, FILE* fp);
+void teh_model_read_file(struct teh_model* x, const char* path);
+void teh_model_free(struct teh_model* x);
 
-#define teh_model_vertex_c(x) \
-	((x)->frame_c * teh_model_frame_vertex_c(x))
-
-#define teh_model_tex_coord_c(x) \
-	teh_model_frame_vertex_c(x)
-
-#define teh_model_tex_coord_sz(x) \
-	(teh_model_tex_coord_c(x) * sizeof (float[2]))
-
-#define teh_model_frame_vertex_sz(x) \
-	(teh_model_frame_vertex_c(x) * sizeof (float[3]))
-
-#define teh_model_vertex_sz(x) \
-	((x)->frame_c * teh_model_frame_vertex_sz(x))
-
-#define teh_model_vbo_tex_coord_off(x) \
-	((uintptr_t) 0)
-
-#define teh_model_vbo_vertex_off(x) \
-	((uintptr_t) teh_model_tex_coord_sz(x))
-
-#define teh_model_vbo_frame_vertex_off(x, f) \
-	((uintptr_t) (teh_model_vbo_vertex_off(x) + (f) * teh_model_frame_vertex_sz(x)))
-
-#define teh_model_vbo_sz(x) \
-	((uintptr_t) (teh_model_tex_coord_sz(x) + teh_model_vertex_sz(x)))
-
-
-void read_teh_model_vertices_stream(struct teh_model* x, FILE* fp);
-void read_teh_model_vertices(struct teh_model* x, const char* path);
-void read_teh_model_texture(struct teh_model* x, const char* path);
-
-void r_load_teh_model_vbo(struct teh_model* x);
-void r_load_teh_model_texture(struct teh_model* x);
-
+void r_teh_model_load_vbo(struct teh_model* x);
+void r_teh_model_load_texture(struct teh_model* x);
+void r_teh_model_load_all(struct teh_model* x);
 void r_teh_model(struct teh_model* x, unsigned long t);
-
-void r_unload_teh_model_texture(struct teh_model* x);
-void r_unload_teh_model_vbo(struct teh_model* x);
-void r_unload_teh_model(struct teh_model* x);
-
-void free_teh_model_texture(struct teh_model* x);
-void free_teh_model_vertices(struct teh_model* x);
-void free_teh_model(struct teh_model* x);
+void r_teh_model_unload_texture(struct teh_model* x);
+void r_teh_model_unload_vbo(struct teh_model* x);
+void r_teh_model_unload_all(struct teh_model* x);
 
 #endif

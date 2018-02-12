@@ -11,6 +11,8 @@
 #include "controller.h"
 #include "renderer.h"
 
+#include <SDL_image.h>
+
 /* begin stuff */
 #include "teh_model.h"
 
@@ -18,15 +20,19 @@ struct teh_model igualopeople;
 
 void init()
 {
-	read_teh_model_vertices(&igualopeople, "igualopeople.teh");
-	read_teh_model_texture(&igualopeople, "igualopeople.png");
+	teh_model_read_file(&igualopeople, "igualopeople.teh");
+	igualopeople.texture = IMG_Load("igualopeople.png");
+	assert (igualopeople.texture);
 
-	r_load_teh_model_vbo(&igualopeople);
-	r_load_teh_model_texture(&igualopeople);
-	free_teh_model(&igualopeople);
+	r_teh_model_load_vbo(&igualopeople);
+	r_teh_model_load_texture(&igualopeople);
 
-	assert (0 < igualopeople.triangle_c);
-	assert (0 < igualopeople.frame_c);
+	teh_model_free(&igualopeople);
+	SDL_FreeSurface(igualopeople.texture);
+
+	/* FIXME: escrever testes decentemente */
+	assert (0 < igualopeople.n_tris);
+	assert (0 < igualopeople.n_frames);
 }
 
 void frame()
@@ -44,7 +50,7 @@ void frame()
 
 void fini()
 {
-	r_unload_teh_model(&igualopeople);
+	r_teh_model_unload_all(&igualopeople);
 }
 /* end stuff */
 

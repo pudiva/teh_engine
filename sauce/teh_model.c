@@ -8,102 +8,110 @@
 #include <SDL_image.h>
 
 /*
- * read
+ * lê vetores
  *
  */
-void read_teh_model_vertices_stream(struct teh_model* x, FILE* fp)
+static void scan_vec3(float* x, FILE* fp)
 {
-	int i, r;
+	int r;
+	r = fscanf(fp, "%f %f %f\n", x, x+1, x+2);
+	assert (r == 3);
+}
+
+static void scan_vec2(float* x, FILE* fp)
+{
+	int r;
+	r = fscanf(fp, "%f %f\n", x, x+1);
+	assert (r == 2);
+}
+
+/*
+ * lê teh_model de uma fonte
+ *
+ */
+void teh_model_read(struct teh_model* x, FILE* fp)
+{
+	int i, j, k, r;
+
 	memset(x, 0, sizeof (*x));
 
 	fscanf(fp, "dota? =op\n");
-	fscanf(
-			fp,
-			"teh model has %d triangles and %d frames.\n",
-			&x->triangle_c,
-			&x->frame_c
-	      );
+	r = fscanf(fp, "teh model has %d triangles and %d frames.\n",
+			&x->n_tris, &x->n_frames);
 
-	x->tex_coord_v = malloc(teh_model_tex_coord_sz(x));
-	x->vertex_v = malloc(teh_model_vertex_sz(x));
+	assert (r == 2);
+
+	x->texcoords = calloc(x->n_tris, sizeof (float[3][2]));
+	x->tris = calloc(x->n_frames * x->n_tris, sizeof (float[3][3]));
 
 	fscanf(fp, "teh texcoords are\n");
-	for (i = 0; i < teh_model_tex_coord_c(x); ++i)
-	{
-		r = fscanf(
-				fp,
-				"%f %f\n",
-				&x->tex_coord_v[i][0],
-				&x->tex_coord_v[i][1]
-			  );
-		assert (r == 2);
-	}
+	for (i = 0; i < x->n_tris; ++i)
+		for (j = 0; j < 3; ++j)
+			scan_vec2(x->texcoords[i][j], fp);
 
 	fscanf(fp, "and teh vertices are\n");
-	for (i = 0; i < teh_model_vertex_c(x); ++i)
-	{
-		r = fscanf(
-				fp,
-				"%f %f %f\n",
-				&x->vertex_v[i][0],
-				&x->vertex_v[i][1],
-				&x->vertex_v[i][2]
-			  );
-		assert (r == 3);
-	}
+	for (k = 0; k < x->n_frames; ++k)
+		for (i = 0; i < x->n_tris; ++i)
+			for (j = 0; j < 3; ++j)
+				scan_vec3(x->tris[k * x->n_tris + i][j], fp);
 }
 
-void read_teh_model_vertices(struct teh_model* x, const char* path)
+/*
+ * lê teh_model de um arquivo
+ *
+ */
+void teh_model_read_file(struct teh_model* x, const char* path)
 {
 	FILE* fp;
 	fp = fopen(path, "r");
 	assert (fp);
-	read_teh_model_vertices_stream(x, fp);
+	teh_model_read(x, fp);
 	fclose(fp);
 }
 
-void read_teh_model_texture(struct teh_model* x, const char* path)
+/*
+ * liberdady
+ *
+ */
+void teh_model_free(struct teh_model* x)
 {
-	x->texture = IMG_Load(path);
-	assert (x->texture);
+	free(x->tris);
+	free(x->texcoords);
 }
 
 /*
- * load
+ * carrega VBO
  *
  */
-void r_load_teh_model_vbo(struct teh_model* x)
+void r_teh_model_load_vbo(struct teh_model* x)
 {
+	int vbo_size;
+
 	glGenBuffers(1, &x->vbo_id);
 	glBindBuffer(GL_ARRAY_BUFFER, x->vbo_id);
 
-	glBufferData(
-			GL_ARRAY_BUFFER,
-			teh_model_vbo_sz(x),
-			NULL,
-			GL_STATIC_DRAW
-		    );
+	x->vbo_texcoords_off = 0;
+	x->vbo_tris_off = x->n_tris * sizeof(float[3][2]);
+	x->vbo_frame_size = x->n_tris * sizeof (float[3][3]);
+	vbo_size = x->n_frames * x->n_tris * sizeof (float[3][5]);
+		
+	glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL, GL_STATIC_DRAW);
 
-	glBufferSubData(
-			GL_ARRAY_BUFFER,
-			teh_model_vbo_tex_coord_off(x),
-			teh_model_tex_coord_sz(x),
-			x->tex_coord_v
-		       );
-
-	glBufferSubData(
-			GL_ARRAY_BUFFER,
-			teh_model_vbo_vertex_off(x),
-			teh_model_vertex_sz(x),
-			x->vertex_v
-		       );
+	glBufferSubData(GL_ARRAY_BUFFER, x->vbo_texcoords_off,
+			x->vbo_tris_off, x->texcoords);
+	glBufferSubData(GL_ARRAY_BUFFER, x->vbo_tris_off,
+			x->n_frames * x->vbo_frame_size, x->tris);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void r_load_teh_model_texture(struct teh_model* x)
+/*
+ * carrega texture
+ *
+ */
+void r_teh_model_load_texture(struct teh_model* x)
 {
-	glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &x->texture_id);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
 	r_surface_2_texture(x->texture);
@@ -111,22 +119,27 @@ void r_load_teh_model_texture(struct teh_model* x)
 }
 
 /*
- * draw
+ * carrega tudo na gpu
+ *
+ */
+void r_teh_model_load_all(struct teh_model* x)
+{
+	r_teh_model_load_vbo(x);
+	r_teh_model_load_texture(x);
+}
+
+/*
+ * desenha a parada
  *
  */
 void r_teh_model(struct teh_model* x, unsigned long t)
 {
 	int f1, f2;
 	float w;
-	const GLvoid* v1_off, * v2_off, * tc_off;
 
-	f1 = ((t * TEH_MODEL_FPS) / 1000) % x->frame_c;
-	f2 = (f1 + 1) % x->frame_c;
+	f1 = ((t * TEH_MODEL_FPS) / 1000) % x->n_frames;
+	f2 = (f1 + 1) % x->n_frames;
 	w = ((float) (t - f1 * TEH_MODEL_FPS * 1000)) / 1000;
-
-	v1_off = (const GLvoid*) teh_model_vbo_frame_vertex_off(x, f1);
-	v2_off = (const GLvoid*) teh_model_vbo_frame_vertex_off(x, f2);
-	tc_off = (const GLvoid*) teh_model_vbo_tex_coord_off(x);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
@@ -135,51 +148,33 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	glUniform1f(r_vertex_w_loc, w);
 	glBindBuffer(GL_ARRAY_BUFFER, x->vbo_id);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, v1_off);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, v2_off);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, tc_off);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,
+			NULL + x->vbo_tris_off + f1 * x->vbo_frame_size);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,
+			NULL + x->vbo_tris_off + f2 * x->vbo_frame_size);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0,
+			NULL + x->vbo_texcoords_off);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3 * x->triangle_c);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * x->n_tris);
 }
 
 /*
- * unload
+ * descarrega as parada
  *
  */
-void r_unload_teh_model_texture(struct teh_model* x)
+void r_teh_model_unload_texture(struct teh_model* x)
 {
 	glDeleteTextures(1, &x->texture_id);
 }
 
-void r_unload_teh_model_vbo(struct teh_model* x)
+void r_teh_model_unload_vbo(struct teh_model* x)
 {
 	glDeleteBuffers(1, &x->vbo_id);
 	x->vbo_id = 0;
 }
 
-void r_unload_teh_model(struct teh_model* x)
+void r_teh_model_unload_all(struct teh_model* x)
 {
-	r_unload_teh_model_texture(x);
-	r_unload_teh_model_vbo(x);
-}
-
-/*
- * free
- *
- */
-void free_teh_model_texture(struct teh_model* x)
-{
-	SDL_FreeSurface(x->texture);
-}
-
-void free_teh_model_vertices(struct teh_model* x)
-{
-	free(x->vertex_v);
-	free(x->tex_coord_v);
-}
-
-void free_teh_model(struct teh_model* x)
-{
-	free_teh_model_texture(x);
-	free_teh_model_vertices(x);
+	r_teh_model_unload_texture(x);
+	r_teh_model_unload_vbo(x);
 }

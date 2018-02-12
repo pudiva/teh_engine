@@ -67,14 +67,14 @@ static void to_tris()
 
 	px = &list;
 	list = NULL;
-	for (i = 0; i < in.triangle_c; ++i)
+	for (i = 0; i < in.n_tris; ++i)
 	{
 		(*px) = tri_alloc();
 
 		for (j = 0; j < 3; ++j)
 		{
-			vec3_copy(in.vertex_v[3*i+j], (*px)->v[j]);
-			vec2_copy(in.tex_coord_v[3*i+j], (*px)->tc[j]);
+			vec3_copy(in.tris[i][j], (*px)->v[j]);
+			vec2_copy(in.texcoords[i][j], (*px)->tc[j]);
 		}
 
 		vec3_copy((*px)->v[1], e1);
@@ -101,22 +101,22 @@ static void to_model()
 
 	for (i = 0, cur = list; cur; ++i, cur = cur->next);
 
-	out.triangle_c = i;
-	out.frame_c = 1;
+	out.n_tris = i;
+	out.n_frames = 1;
 	out.texture = in.texture;
 
-	printf("out.triangle_c = %d\n", out.triangle_c);
-	printf("in.triangle_c = %d\n", in.triangle_c);
+	printf("out.n_tris = %d\n", out.n_tris);
+	printf("in.n_tris = %d\n", in.n_tris);
 
-	out.vertex_v = calloc(3*i, sizeof (float[3]));
-	out.tex_coord_v = calloc(3*i, sizeof (float[2]));
+	out.tris = calloc(i, sizeof (float[3][3]));
+	out.texcoords = calloc(i, sizeof (float[3][2]));
 
 	for (i = 0, cur = list; cur; ++i, cur = cur->next)
 	{
 		for (j = 0; j < 3; ++j)
 		{
-			vec3_copy(cur->v[j], out.vertex_v[3*i+j]);
-			vec2_copy(cur->tc[j], out.tex_coord_v[3*i+j]);
+			vec3_copy(cur->v[j], out.tris[i][j]);
+			vec2_copy(cur->tc[j], out.texcoords[i][j]);
 		}
 	}
 }
@@ -125,18 +125,18 @@ static void assert_in_eq_out()
 {
 	int i, j;
 
-	assert (out.triangle_c == in.triangle_c);
+	assert (out.n_tris == in.n_tris);
 
-	for (i = 0; i < out.triangle_c; ++i)
+	for (i = 0; i < out.n_tris; ++i)
 	{
 		for (j = 0; j < 3; ++j)
 		{
-			assert (in.vertex_v[3*i+j][0] == out.vertex_v[3*i+j][0]);
-			assert (in.vertex_v[3*i+j][1] == out.vertex_v[3*i+j][1]);
-			assert (in.vertex_v[3*i+j][2] == out.vertex_v[3*i+j][2]);
+			assert (in.tris[i][j][0] == out.tris[i][j][0]);
+			assert (in.tris[i][j][1] == out.tris[i][j][1]);
+			assert (in.tris[i][j][2] == out.tris[i][j][2]);
 
-			assert (in.tex_coord_v[3*i+j][0] == out.tex_coord_v[3*i+j][0]);
-			assert (in.tex_coord_v[3*i+j][1] == out.tex_coord_v[3*i+j][1]);
+			assert (in.texcoords[i][j][0] == out.texcoords[i][j][0]);
+			assert (in.texcoords[i][j][1] == out.texcoords[i][j][1]);
 		}
 	}
 }
@@ -144,11 +144,13 @@ static void assert_in_eq_out()
 int main(int argc, char *argv[])
 {
 	assert (argc == 2);
-	read_teh_model_vertices(&in, argv[1]);
+	teh_model_read_file(&in, argv[1]);
 
-	fprintf(stderr, "compiling model with %d triangles and %d frames\n", in.triangle_c, in.frame_c);
-	assert (0 < in.triangle_c);
-	assert (0 < in.frame_c);
+	fprintf(stderr, "compiling model with %d triangles and %d frames\n",
+			in.n_tris, in.n_frames);
+
+	assert (0 < in.n_tris);
+	assert (0 < in.n_frames);
 
 	to_tris();
 	assert (list);
@@ -164,6 +166,6 @@ int main(int argc, char *argv[])
 
 	graph();
 
-	free_teh_model(&in);
+	teh_model_free(&in);
 	return 0;
 }
