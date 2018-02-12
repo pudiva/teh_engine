@@ -1,6 +1,7 @@
 #include <check.h>
 
 Suite* tri_split_suite();
+Suite* bspc_suite();
 
 int main(int argc, char* argv[])
 {
@@ -8,6 +9,7 @@ int main(int argc, char* argv[])
 	SRunner *sr;
 
 	sr = srunner_create(tri_split_suite());
+	srunner_add_suite(sr, bspc_suite());
 
 	srunner_run_all(sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed(sr);

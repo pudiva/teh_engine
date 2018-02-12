@@ -28,10 +28,9 @@ void node_free(struct node* node)
 }
 
 /*
- * encontra melhor divisor
+ * compiler!11!!1
  *
  */
-
 struct node* bspc(struct tri* list)
 {
 	struct tri* splitter, * best, * cur, * next;

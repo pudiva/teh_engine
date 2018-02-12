@@ -72,6 +72,7 @@ PRGS := \
 CHECK_OBJS := \
 	build/check/check.o \
 	build/check/check_tri_split.o \
+	build/check/check_bspc.o \
 
 ALL_FILES := \
 	$(SHADERS) \
