@@ -1,10 +1,10 @@
-#include "vec.h"
-#include "tri.h"
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
+
+#include "vec.h"
+#include "tri.h"
 
 /*
  * coisas públicas
@@ -126,9 +126,9 @@ void tri_split_prepare(struct tri* src, float* plane)
 		case 3:
 			x_side = 1;
 	}
+	n_parts[x_side+1] = 1;
 
 BATEU_A_ONDA_FORTE:
-	n_parts[x_side+1] = 1;
 
 	score = (n_parts[0] + n_parts[1] - n_parts[2]) * UNBALANCE_WEIGHT +
 		(n_parts[0] + n_parts[1] + n_parts[2]) * N_PARTS_WEIGHT;
@@ -174,7 +174,7 @@ void tri_split(void)
 		y[x_side+1] = x;
 	}
 
-	if (0 < n_splits)
+	else if (0 < n_splits)
 	{
 		ya = y[cmp[a]+1] = x;
 		yb = y[cmp[b]+1] = tri_alloc();

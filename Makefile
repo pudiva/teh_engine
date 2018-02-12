@@ -69,6 +69,10 @@ PRGS := \
 	build/teh_bspc \
 	build/teh_engine
 
+CHECK_OBJS := \
+	build/check/check.o \
+	build/check/check_tri_split.o \
+
 ALL_FILES := \
 	$(SHADERS) \
 	$(STATE_MACHINES) \
@@ -114,6 +118,6 @@ build/teh_engine: build/teh_engine.o $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 # checks
-build/check/check: build/check/check.o $(BSPC_OBJS) $(OBJS)
+build/check/check: $(CHECK_OBJS) $(BSPC_OBJS) $(OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -lcheck -o $@ $^
