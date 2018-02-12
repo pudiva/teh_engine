@@ -88,7 +88,7 @@ struct node* bspc(struct tri* list)
 	for (cur = list, next = cur->next; cur; cur = next, next = cur->next)
 	{
 		/* diviception */
-		if (cur == splitter || cur->used)
+		if (cur == splitter)
 			continue;
 
 		tri_split_prepare(list, best->p);
