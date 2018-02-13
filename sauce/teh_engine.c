@@ -20,7 +20,7 @@ struct teh_model igualopeople;
 
 void init()
 {
-	teh_model_read_file(&igualopeople, "igualopeople.teh");
+	teh_model_read_file(&igualopeople, "igualopeople.teh_model");
 	igualopeople.texture = IMG_Load("igualopeople.png");
 	assert (igualopeople.texture);
 
