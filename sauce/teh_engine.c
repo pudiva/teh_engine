@@ -8,31 +8,35 @@
 #include <stdio.h>
 
 #include "window.h"
-#include "controller.h"
 #include "renderer.h"
 
-#include <SDL_image.h>
-
 /* begin stuff */
-#include "teh_model.h"
+#include "assets.h"
+#include "r_teh_model.h"
+#include "r_teh_bsp.h"
+#include "vec.h"
 
-struct teh_model igualopeople;
+struct teh_model* igualopeople;
+struct teh_bsp* igualobsp;
 
 void init()
 {
-	teh_model_read_file(&igualopeople, "igualopeople.teh_model");
-	igualopeople.texture = IMG_Load("igualopeople.png");
-	assert (igualopeople.texture);
+	igualopeople = teh_model_get("igualopeople.teh");
+	assert (igualopeople);
 
-	r_teh_model_load_vbo(&igualopeople);
-	r_teh_model_load_texture(&igualopeople);
+	igualobsp = teh_bsp_get("igualopeople.bps");
+	assert (igualobsp);
 
-	teh_model_free(&igualopeople);
-	SDL_FreeSurface(igualopeople.texture);
+	igualopeople->texture = image_get("igualopeople.png");
+	igualobsp->model.texture = image_get("igualopeople.png");
+	assert (igualopeople->texture);
 
-	/* FIXME: escrever testes decentemente */
-	assert (0 < igualopeople.n_tris);
-	assert (0 < igualopeople.n_frames);
+	r_teh_model_load_all(igualopeople);
+	r_teh_model_load_all(&igualobsp->model);
+}
+
+void fini()
+{
 }
 
 void frame()
@@ -45,14 +49,10 @@ void frame()
 	//glUniform3f(r_pos_loc, 0, 0, -3);
 	//glUniform4f(r_color_loc, .5, .5, .5, 1);
 
-	r_teh_model_at_time(&igualopeople, SDL_GetTicks());
+	//r_teh_model_at_time(igualopeople, SDL_GetTicks());
+	r_teh_model_at_time(&igualobsp->model, SDL_GetTicks());
+	//r_teh_bsp_from_eye(igualobsp, zero3);
 }
-
-void fini()
-{
-	r_teh_model_unload_all(&igualopeople);
-}
-/* end stuff */
 
 static bool should_run = true;
 
@@ -68,9 +68,6 @@ static void handle_events()
 			puts("Quitting");
 			should_run = false;
 			break;
-
-		default:
-			controller_handle(&ev);
 		}
 	}
 }
