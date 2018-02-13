@@ -110,7 +110,6 @@ struct node* bspc(struct tri* list)
 	front = NULL;
 	pback = &back;
 	pfront = &front;
-	best->used = true;
 
 	vec4_copy(best->p, node->plane);
 
@@ -140,7 +139,11 @@ struct node* bspc(struct tri* list)
 			(*pfront) = tri_split_parts[1];
 
 			while (*pfront)
+			{
+				/* marca tudo nesse plano como usado! */
+				(*pfront)->used = true;
 				pfront = &(*pfront)->next;
+			}
 		}
 
 		/* lista da frente */
