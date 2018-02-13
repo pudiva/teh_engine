@@ -132,15 +132,8 @@ void r_teh_model_load_all(struct teh_model* x)
  * desenha a parada
  *
  */
-void r_teh_model(struct teh_model* x, unsigned long t)
+void r_teh_model(struct teh_model* x, float w, int f1, int f2, int off, int n)
 {
-	int f1, f2;
-	float w;
-
-	f1 = ((t * TEH_MODEL_FPS) / 1000) % x->n_frames;
-	f2 = (f1 + 1) % x->n_frames;
-	w = ((float) (t - f1 * TEH_MODEL_FPS * 1000)) / 1000;
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, x->texture_id);
 	glUniform1i(r_texture_sampler_loc, 0);
@@ -149,13 +142,25 @@ void r_teh_model(struct teh_model* x, unsigned long t)
 	glBindBuffer(GL_ARRAY_BUFFER, x->vbo_id);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_tris_off + f1 * x->vbo_frame_size);
+			NULL + x->vbo_tris_off + f1 * x->vbo_frame_size + off);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_tris_off + f2 * x->vbo_frame_size);
+			NULL + x->vbo_tris_off + f2 * x->vbo_frame_size + off);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_texcoords_off);
+			NULL + x->vbo_texcoords_off + off);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3 * x->n_tris);
+	glDrawArrays(GL_TRIANGLES, 0, 3*n);
+}
+
+void r_teh_model_at_time(struct teh_model* x, unsigned long t)
+{
+	int f1, f2;
+	float w;
+
+	f1 = ((t * TEH_MODEL_FPS) / 1000) % x->n_frames;
+	f2 = (f1 + 1) % x->n_frames;
+	w = ((float) (t - f1 * TEH_MODEL_FPS * 1000)) / 1000;
+
+	r_teh_model(x, w, f1, f2, 0, x->n_tris);
 }
 
 /*
