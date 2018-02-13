@@ -12,6 +12,7 @@ struct node
 {
 	bool is_leaf;
 	bool is_solid;
+	float plane[4];
 	struct node* back, * front;
 	struct tri* tris;
 };

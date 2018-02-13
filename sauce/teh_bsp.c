@@ -8,8 +8,9 @@
 static void inline scan_teh_bsp_node(int i, struct teh_bsp_node* n, FILE* fp)
 {
 	int r, back, front;
-	r = fscanf(fp, "%hhd %hhd %d %d %d %d\n",
+	r = fscanf(fp, "%hhd %hhd %f %f %f %f %d %d %d %d\n",
 			(char*) &n[i].is_leaf, (char*) &n[i].is_solid,
+			n[i].plane, n[i].plane+1, n[i].plane+2, n[i].plane+3,
 			&n[i].off, &n[i].size,
 			&back, &front);
 
@@ -51,8 +52,9 @@ static void inline print_teh_bsp_node(int i, struct teh_bsp_node* n, FILE* fp)
 	back = n[i].back ? (n[i].back - n) : -1;
 	front = n[i].front ? (n[i].front - n) : -1;
 
-	fprintf(fp, "%hhd %hhd %d %d %ld %ld\n",
+	fprintf(fp, "%hhd %hhd %f %f %f %f %d %d %ld %ld\n",
 			n[i].is_leaf, n[i].is_solid,
+			n[i].plane[0], n[i].plane[1], n[i].plane[2], n[i].plane[3],
 			n[i].off, n[i].size,
 			back, front);
 }

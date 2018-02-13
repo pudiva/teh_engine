@@ -112,6 +112,8 @@ struct node* bspc(struct tri* list)
 	pfront = &front;
 	best->used = true;
 
+	vec4_copy(best->p, node->plane);
+
 	/* divide todos os triangulos com o melhor divisor encontrado */
 	for (cur = list; cur; cur = save)
 	{
@@ -193,6 +195,7 @@ static inline int convert_node(
 
 	d[i].is_leaf = s[i].is_leaf;
 	d[i].is_solid = s[i].is_solid;
+	vec4_copy(s[i].plane, d[i].plane);
 	d[i].back = s[i].back ? d + (s[i].back - s) : NULL;
 	d[i].front = s[i].front ? d + (s[i].front - s) : NULL;
 

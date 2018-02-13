@@ -8,6 +8,7 @@ struct teh_bsp_node
 {
 	bool is_leaf, is_solid;
 	int off, size;
+	float plane[4];
 	struct teh_bsp_node* back, * front;
 };
 
