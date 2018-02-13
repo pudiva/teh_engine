@@ -14,7 +14,7 @@ static void inline scan_teh_bsp_node(int i, struct teh_bsp_node* n, FILE* fp)
 			&n[i].off, &n[i].size,
 			&back, &front);
 
-	assert (r == 4);
+	assert (r == 10);
 
 	n->back = -1 < back ? n + back : NULL;
 	n->front = -1 < front ? n + front : NULL;
