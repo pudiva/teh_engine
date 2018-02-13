@@ -2,7 +2,7 @@
 #include "r_teh_model.h"
 #include "vec.h"
 
-static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, float* eye)
+static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const float* eye)
 {
 	float h;
 
@@ -14,7 +14,7 @@ static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, float*
 	draw_node(bsp, (h < 0 ? n->back : n->front), eye);
 }
 
-void r_teh_bsp_from_eye(struct teh_bsp* bsp, float* eye)
+void r_teh_bsp_from_eye(struct teh_bsp* bsp, const float* eye)
 {
 	draw_node(bsp, bsp->nodes, eye);
 }

@@ -3,6 +3,6 @@
 
 #include "teh_bsp.h"
 
-void r_teh_bsp_from_eye(struct teh_bsp* bsp, float* eye);
+void r_teh_bsp_from_eye(struct teh_bsp* bsp, const float* eye);
 
 #endif
