@@ -50,8 +50,8 @@ void frame()
 	//glUniform4f(r_color_loc, .5, .5, .5, 1);
 
 	//r_teh_model_at_time(igualopeople, SDL_GetTicks());
-	r_teh_model_at_time(&igualobsp->model, SDL_GetTicks());
-	//r_teh_bsp_from_eye(igualobsp, zero3);
+	//r_teh_model_at_time(&igualobsp->model, SDL_GetTicks());
+	r_teh_bsp_from_eye(igualobsp, zero3);
 }
 
 static bool should_run = true;
