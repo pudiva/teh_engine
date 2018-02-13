@@ -1,4 +1,5 @@
 /build
 *.swp
-*.teh
+*.teh_bsp
+*.teh_model
 
