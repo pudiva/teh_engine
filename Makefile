@@ -13,6 +13,7 @@ CFLAGS := \
 	`pkg-config sdl2 --cflags` \
 	`pkg-config SDL2_image --cflags` \
 	`pkg-config SDL2_mixer --cflags` \
+	`pkg-config check --cflags` \
 	`pkg-config libgvc --cflags` \
 	-std=c99 \
 	-Wall \
@@ -28,14 +29,10 @@ LDFLAGS := \
 	`pkg-config sdl2 --libs` \
 	`pkg-config SDL2_image --libs` \
 	`pkg-config SDL2_mixer --libs` \
+	`pkg-config check --libs` \
+	`pkg-config libgvc --libs` \
 	-lGLESv2 \
 	$(LDFLAGS)
-
-# ragel
-RAGEL := ragel
-
-RLFLAGS := \
-
 
 #
 # target lists
@@ -44,25 +41,34 @@ SHADERS := \
 	build/r_fragment_shader.glsl.c \
 	build/r_vertex_shader.glsl.c
 
-STATE_MACHINES := \
-	build/model.rl.c
-
-OBJS := \
-	build/window.o \
-	build/r_fragment_shader.glsl.o \
-	build/r_vertex_shader.glsl.o \
-	build/renderer.o \
-	build/controller.o \
+LIB_OBJS := \
 	build/teh_model.o \
 	build/vec.o \
 	build/assets.o \
 	build/teh_bsp.o \
 
+GUI_OBJS := \
+	build/window.o \
+	build/r_fragment_shader.glsl.o \
+	build/r_vertex_shader.glsl.o \
+	build/renderer.o \
+	build/controller.o \
+	build/r_teh_model.o \
+
 BSPC_OBJS := \
 	build/tri.o \
 	build/bspc.o \
 
-PRG_OBJS := \
+CHECK_OBJS := \
+	build/check/check.o \
+	build/check/check_tri_split.o \
+	build/check/check_bspc.o \
+
+OBJS := \
+	$(LIB_OBJS) \
+	$(GUI_OBJS) \
+	$(BSPC_OBJS) \
+	$(CHECK_OBJS) \
 	build/check/check.o \
 	build/teh_bspc.o \
 	build/teh_engine.o \
@@ -72,18 +78,9 @@ PRGS := \
 	build/teh_bspc \
 	build/teh_engine
 
-CHECK_OBJS := \
-	build/check/check.o \
-	build/check/check_tri_split.o \
-	build/check/check_bspc.o \
-
 ALL_FILES := \
 	$(SHADERS) \
-	$(STATE_MACHINES) \
 	$(OBJS) \
-	$(BSPC_OBJS) \
-	$(PRG_OBJS) \
-	$(CHECK_OBJS) \
 	$(PRGS) \
 
 #
@@ -118,16 +115,8 @@ build/%.o: sauce/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # prgs
-# FIXME: bspc ta dependendo de tudo
-build/teh_bspc: build/teh_bspc.o $(BSPC_OBJS) $(OBJS)
-	mkdir -p `dirname $@`
-	$(LD) $(LDFLAGS) `pkg-config --libs libgvc` -o $@ $^
-
-build/teh_engine: build/teh_engine.o $(OBJS)
+build/teh_bspc: build/teh_bspc.o $(BSPC_OBJS) $(LIB_OBJS)
+build/teh_engine: build/teh_engine.o $(LIB_OBJS) $(GUI_OBJS)
+build/check/check: build/check/check.o $(CHECK_OBJS) $(BSPC_OBJS) $(LIB_OBJS) $(GUI_OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -o $@ $^
-
-# checks
-build/check/check: $(CHECK_OBJS) $(BSPC_OBJS) $(OBJS)
-	mkdir -p `dirname $@`
-	$(LD) $(LDFLAGS) -lcheck -o $@ $^
