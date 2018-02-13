@@ -32,9 +32,74 @@ struct tri* tri_alloc()
 	return &tri_pool[tri_pool_c++];
 }
 
-void tri_free(struct tri* tri)
+/*
+ * conversão entre teh_model
+ *
+ */
+struct tri* tri_from_teh_model(struct teh_model* model)
 {
-	/* TODO */
+	int i, j;
+	struct tri* list;
+	struct tri** px;
+	float e1[3], e2[3];
+
+	px = &list;
+	list = NULL;
+	for (i = 0; i < model->n_tris; ++i)
+	{
+		(*px) = tri_alloc();
+
+		for (j = 0; j < 3; ++j)
+		{
+			vec3_copy(model->tris[i][j], (*px)->v[j]);
+			vec2_copy(model->texcoords[i][j], (*px)->tc[j]);
+		}
+
+		vec3_copy((*px)->v[1], e1);
+		vec3_axpy(-1, (*px)->v[0], e1);
+
+		vec3_copy((*px)->v[2], e2);
+		vec3_axpy(-1, (*px)->v[0], e2);
+
+		vec3_cross(e1, e2, (*px)->p);
+		vec3_normalize((*px)->p);
+		(*px)->p[3] = vec3_dot((*px)->v[0], (*px)->p);
+
+		assert ((*px) != (*px)->next);
+		px = &(*px)->next;
+
+		assert ((*px) == NULL);
+	}
+
+	return list;
+}
+
+struct teh_model* tri_to_teh_model(struct tri* list)
+{
+	int i, j;
+	struct tri* cur;
+	struct teh_model* model;
+
+	model = calloc(1, sizeof (struct teh_model));
+
+	for (i = 0, cur = list; cur; ++i, cur = cur->next);
+
+	model->n_tris = i;
+	model->n_frames = 1;
+
+	model->tris = calloc(i, sizeof (float[3][3]));
+	model->texcoords = calloc(i, sizeof (float[3][2]));
+
+	for (i = 0, cur = list; cur; ++i, cur = cur->next)
+	{
+		for (j = 0; j < 3; ++j)
+		{
+			vec3_copy(cur->v[j], model->tris[i][j]);
+			vec2_copy(cur->tc[j], model->texcoords[i][j]);
+		}
+	}
+
+	return model;
 }
 
 /*
