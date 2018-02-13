@@ -110,7 +110,7 @@ struct teh_bsp* teh_bsp_get(const char* path)
 
 	if (!bsp)
 	{
-		bsp = calloc(1, sizeof (struct teh_model));
+		bsp = calloc(1, sizeof (struct teh_bsp));
 		teh_bsp_read_file(bsp, path);
 		set(path, bsp);
 	}
