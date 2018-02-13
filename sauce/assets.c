@@ -102,6 +102,22 @@ struct teh_model* teh_model_get(const char* path)
 	return model;
 }
 
+struct teh_bsp* teh_bsp_get(const char* path)
+{
+	struct teh_bsp* bsp;
+
+	bsp = get(path);
+
+	if (!bsp)
+	{
+		bsp = calloc(1, sizeof (struct teh_model));
+		teh_bsp_read_file(bsp, path);
+		set(path, bsp);
+	}
+
+	return bsp;
+}
+
 struct SDL_Surface* image_get(const char* path)
 {
 	SDL_Surface* surf;
