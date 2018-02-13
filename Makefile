@@ -81,7 +81,10 @@ ALL_FILES := \
 	$(SHADERS) \
 	$(STATE_MACHINES) \
 	$(OBJS) \
-	$(PRGS)
+	$(BSPC_OBJS) \
+	$(PRG_OBJS) \
+	$(CHECK_OBJS) \
+	$(PRGS) \
 
 #
 # recipes
@@ -92,7 +95,7 @@ ALL_FILES := \
 all: $(PRGS)
 
 clean:
-	rm -f $(SHADERS) $(OBJS) $(BSPC_OBJS) $(PRG_OBJS) $(PRGS)
+	rm -f $(ALL_FILES)
 
 check: build/check/check
 	$^
