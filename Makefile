@@ -56,6 +56,7 @@ OBJS := \
 	build/teh_model.o \
 	build/vec.o \
 	build/assets.o \
+	build/teh_bsp.o \
 
 BSPC_OBJS := \
 	build/tri.o \

@@ -11,18 +11,32 @@
  * lê vetores
  *
  */
-static void scan_vec3(float* x, FILE* fp)
+static void inline scan_vec3(float* x, FILE* fp)
 {
 	int r;
 	r = fscanf(fp, "%f %f %f\n", x, x+1, x+2);
 	assert (r == 3);
 }
 
-static void scan_vec2(float* x, FILE* fp)
+static void inline scan_vec2(float* x, FILE* fp)
 {
 	int r;
 	r = fscanf(fp, "%f %f\n", x, x+1);
 	assert (r == 2);
+}
+
+/*
+ * escreve vetores
+ *
+ */
+static void print_vec3(float* x, FILE* fp)
+{
+	fprintf(fp, "%f %f %f\n", x[0], x[1], x[2]);
+}
+
+static void print_vec2(float* x, FILE* fp)
+{
+	fprintf(fp, "%f %f\n", x[0], x[1]);
 }
 
 /*
@@ -57,6 +71,30 @@ void teh_model_read(struct teh_model* x, FILE* fp)
 }
 
 /*
+ * escreve teh_model em uma fonte
+ *
+ */
+void teh_model_write(struct teh_model* x, FILE* fp)
+{
+	int i, j, k;
+
+	fprintf(fp, "dota? =op\n");
+	fprintf(fp, "teh model has %d triangles and %d frames.\n",
+			x->n_tris, x->n_frames);
+
+	fprintf(fp, "teh texcoords are\n");
+	for (i = 0; i < x->n_tris; ++i)
+		for (j = 0; j < 3; ++j)
+			print_vec2(x->texcoords[i][j], fp);
+
+	fprintf(fp, "and teh vertices are\n");
+	for (k = 0; k < x->n_frames; ++k)
+		for (i = 0; i < x->n_tris; ++i)
+			for (j = 0; j < 3; ++j)
+				print_vec3(x->tris[k * x->n_tris + i][j], fp);
+}
+
+/*
  * lê teh_model de um arquivo
  *
  */
@@ -66,6 +104,19 @@ void teh_model_read_file(struct teh_model* x, const char* path)
 	fp = fopen(path, "r");
 	assert (fp);
 	teh_model_read(x, fp);
+	fclose(fp);
+}
+
+/*
+ * escreve teh_model em um arquivo
+ *
+ */
+void teh_model_write_file(struct teh_model* x, const char* path)
+{
+	FILE* fp;
+	fp = fopen(path, "w");
+	assert (fp);
+	teh_model_write(x, fp);
 	fclose(fp);
 }
 

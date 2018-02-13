@@ -9,6 +9,7 @@
 
 struct node* root;
 
+#ifdef GRAPH
 graph_t *g;
 static Agnode_t* graph_node(struct node* n)
 {
@@ -55,28 +56,37 @@ static void graph()
 	gvFreeContext(gvc);
 	fclose(fp);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
-	struct tri* list;
-	struct teh_model* in;
+	struct teh_model* model;
+	struct teh_bsp* bsp;
 
-	assert (argc == 2);
-	in = teh_model_get(argv[1]);
+	assert (argc == 3);
+	model = teh_model_get(argv[1]);
 
-	fprintf(stderr, "compiling model with %d triangles and %d frames\n",
-			in->n_tris, in->n_frames);
+	printf("compiling model with %d triangles and %d frames\n",
+			model->n_tris, model->n_frames);
 
-	assert (0 < in->n_tris);
-	assert (0 < in->n_frames);
+	assert (0 < model->n_tris);
+	assert (0 < model->n_frames);
 
-	list = tri_from_teh_model(in);
-	assert (list);
+	bsp = teh_bspc(model);
+	assert (bsp);
 
-	root = bspc(list);
-	assert (root);
+	assert (0 < bsp->model.n_tris);
+	assert (0 < bsp->n_nodes);
 
-	fprintf(stderr, "bsp has %d nodes\n", node_pool_c);
-	graph();
+	printf("bsp has %d nodes and %d triangles\n",
+			bsp->n_nodes, bsp->model.n_tris);
+
+	teh_bsp_write_file(bsp, argv[2]);
+	printf("written to %s\n", argv[2]);
+
+#ifdef GRAPH
+	//graph();
+#endif
+
 	return 0;
 }

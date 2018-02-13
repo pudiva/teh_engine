@@ -1,6 +1,7 @@
 #ifndef HAS_BSPC_H
 #define HAS_BSPC_H
 
+#include "teh_bsp.h"
 #include "tri.h"
 
 /*
@@ -27,10 +28,8 @@ extern int node_pool_c;
 struct node* node_alloc();
 void node_free(struct node* node);
 
-/*
- * compilador bsp
- *
- */
 struct node* bspc(struct tri* list);
+struct teh_bsp* node_pool_to_teh_bsp();
+struct teh_bsp* teh_bspc(struct teh_model* model);
 
 #endif

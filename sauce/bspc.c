@@ -5,6 +5,9 @@
  * http://www.cs.utah.edu/~jsnider/SeniorProj/BSP/default.htm
  * https://github.com/id-Software/Quake-III-Arena
  *
+ * TODO: fazer interface como máquina de estados.
+ * TODO: função para reiniciar o estado.
+ *
  */
 
 #include <assert.h>
@@ -19,6 +22,7 @@
 #endif
 
 #include "bspc.h"
+#include "vec.h"
 
 struct node node_pool[BSPC_NODE_POOL_LEN];
 int node_pool_c = 0;
@@ -151,4 +155,105 @@ struct node* bspc(struct tri* list)
 	node->back = bspc(back);
 	node->front = bspc(front);
 	return node;
+}
+
+/*
+ * compila teh_model
+ *
+ */
+struct node* bspc_teh_model(struct teh_model* model)
+{
+	struct tri* list;
+	struct node* node;
+
+	list = tri_from_teh_model(model);
+	assert (list);
+
+	node = bspc(list);
+	assert (node);
+
+	return node;
+}
+
+/*
+ * converte para teh_model
+ *
+ */
+static inline int convert_node(
+		int i,
+		int k,
+		struct teh_bsp_node* d,
+		float (*tc)[3][2],
+		float (*v)[3][3],
+		struct node* s
+		)
+{
+	int j;
+	struct tri* t;
+
+	d[i].is_leaf = s[i].is_leaf;
+	d[i].is_solid = s[i].is_solid;
+	d[i].back = s[i].back ? d + (s[i].back - s) : NULL;
+	d[i].front = s[i].front ? d + (s[i].front - s) : NULL;
+
+	/* folha líquida */
+	if (s[i].is_leaf && !s[i].is_solid)
+	{
+		d[i].off = k;
+		d[i].size = 0;
+
+		for (t = s[i].tris; t; t = t->next)
+		{
+			for (j = 0; j < 3; ++j)
+			{
+				vec2_copy(t->tc[j], tc[k][j]);
+				vec3_copy(t->v[j], v[k][j]);
+			}
+			++k;
+			++d[i].size;
+		}
+	}
+
+	return k;
+}
+
+struct teh_bsp* node_pool_to_teh_bsp()
+{
+	int i, k;
+	struct teh_bsp* bsp;
+
+	bsp = calloc(1, sizeof (struct teh_bsp));
+
+	bsp->model.n_tris = tri_pool_c;
+	bsp->model.n_frames = 1;
+	bsp->model.tris = calloc(bsp->model.n_tris, sizeof (float[3][3]));
+	bsp->model.texcoords = calloc(bsp->model.n_tris, sizeof (float[3][2]));
+	bsp->n_nodes = node_pool_c;
+	bsp->nodes = calloc(node_pool_c, sizeof (struct teh_bsp_node));
+
+	k = 0;
+	for (i = 0; i < node_pool_c; ++i)
+		k = convert_node(i, k, bsp->nodes, bsp->model.texcoords, bsp->model.tris, node_pool);
+
+	assert (k == tri_pool_c);
+
+	return bsp;
+}
+
+/*
+ * compila e converte
+ *
+ */
+struct teh_bsp* teh_bspc(struct teh_model* model)
+{
+	struct node* root;
+	struct teh_bsp* bsp;
+
+	root = bspc_teh_model(model);
+	assert (root);
+
+	bsp = node_pool_to_teh_bsp();
+	assert (bsp);
+
+	return bsp;
 }

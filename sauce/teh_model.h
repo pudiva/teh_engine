@@ -28,6 +28,9 @@ struct teh_model
 
 void teh_model_read(struct teh_model* x, FILE* fp);
 void teh_model_read_file(struct teh_model* x, const char* path);
+void teh_model_write(struct teh_model* x, FILE* fp);
+void teh_model_write_file(struct teh_model* x, const char* path);
+
 void teh_model_free(struct teh_model* x);
 
 void r_teh_model_load_vbo(struct teh_model* x);
