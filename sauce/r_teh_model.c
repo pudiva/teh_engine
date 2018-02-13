@@ -64,11 +64,11 @@ void r_teh_model(struct teh_model* x, float w, int f1, int f2, int off, int n)
 	glBindBuffer(GL_ARRAY_BUFFER, x->vbo_id);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_tris_off + f1 * x->vbo_frame_size + off);
+			NULL + x->vbo_tris_off + f1 * x->vbo_frame_size + off * sizeof (float[3][3]));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_tris_off + f2 * x->vbo_frame_size + off);
+			NULL + x->vbo_tris_off + f2 * x->vbo_frame_size + off * sizeof (float[3][3]));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0,
-			NULL + x->vbo_texcoords_off + off);
+			NULL + x->vbo_texcoords_off + off * sizeof (float[3][2]));
 
 	glDrawArrays(GL_TRIANGLES, 0, 3*n);
 }

@@ -2,8 +2,6 @@
 #include "r_teh_model.h"
 #include "vec.h"
 
-#include <stdio.h>
-
 static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const float* eye)
 {
 	float h;
@@ -38,5 +36,7 @@ static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const 
 
 void r_teh_bsp_from_eye(struct teh_bsp* bsp, const float* eye)
 {
+	glDisable(GL_DEPTH_TEST);
 	draw_node(bsp, bsp->nodes, eye);
+	glEnable(GL_DEPTH_TEST);
 }
