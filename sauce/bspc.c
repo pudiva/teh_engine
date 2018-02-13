@@ -119,10 +119,6 @@ struct node* bspc(struct tri* list)
 		tri_split();
 		p('s');
 
-		assert (!tri_split_parts[0] || tri_split_parts[0] != tri_split_parts[1]);
-		assert (!tri_split_parts[1] || tri_split_parts[1] != tri_split_parts[2]);
-		assert (!tri_split_parts[2] || tri_split_parts[2] != tri_split_parts[0]);
-
 		/* lista de tras */
 		if (tri_split_parts[0])
 		{
