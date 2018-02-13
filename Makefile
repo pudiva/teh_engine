@@ -54,6 +54,7 @@ GUI_OBJS := \
 	build/renderer.o \
 	build/controller.o \
 	build/r_teh_model.o \
+	build/r_teh_bsp.o \
 
 BSPC_OBJS := \
 	build/tri.o \
