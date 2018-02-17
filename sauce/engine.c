@@ -44,7 +44,7 @@ void frame()
 	glViewport(0, 0, window_w, window_h);
 
 	float t = ((float) (SDL_GetTicks() % 1000))/1000;
-	r_clear(t, t, t, 1);
+	r_clear(t * (178.0/255), t * (102.0/255), t * (131.0/255), 1);
 
 	//glUniform3f(r_pos_loc, 0, 0, -3);
 	//glUniform4f(r_color_loc, .5, .5, .5, 1);
