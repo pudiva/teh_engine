@@ -2,7 +2,7 @@
 #define HAS_RENDERER_H
 
 #include <SDL_opengles2.h>
-#include "teh_model.h"
+#include "teh.h"
 
 extern GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
 extern GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_texture_sampler_loc;

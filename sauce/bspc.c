@@ -163,15 +163,15 @@ struct node* bspc(struct tri* list)
 }
 
 /*
- * compila teh_model
+ * compila teh
  *
  */
-struct node* bspc_teh_model(struct teh_model* model)
+struct node* bspc_teh(struct teh* model)
 {
 	struct tri* list;
 	struct node* node;
 
-	list = tri_from_teh_model(model);
+	list = tri_from_teh(model);
 	assert (list);
 
 	node = bspc(list);
@@ -181,13 +181,13 @@ struct node* bspc_teh_model(struct teh_model* model)
 }
 
 /*
- * converte para teh_model
+ * converte para teh
  *
  */
 static inline int convert_node(
 		int i,
 		int k,
-		struct teh_bsp_node* d,
+		struct beh_node* d,
 		float (*tc)[3][2],
 		float (*v)[3][3],
 		struct node* s
@@ -223,19 +223,19 @@ static inline int convert_node(
 	return k;
 }
 
-struct teh_bsp* node_pool_to_teh_bsp()
+struct beh* node_pool_to_beh()
 {
 	int i, k;
-	struct teh_bsp* bsp;
+	struct beh* bsp;
 
-	bsp = calloc(1, sizeof (struct teh_bsp));
+	bsp = calloc(1, sizeof (struct beh));
 
 	bsp->model.n_tris = tri_pool_c;
 	bsp->model.n_frames = 1;
 	bsp->model.tris = calloc(bsp->model.n_tris, sizeof (float[3][3]));
 	bsp->model.texcoords = calloc(bsp->model.n_tris, sizeof (float[3][2]));
 	bsp->n_nodes = node_pool_c;
-	bsp->nodes = calloc(node_pool_c, sizeof (struct teh_bsp_node));
+	bsp->nodes = calloc(node_pool_c, sizeof (struct beh_node));
 
 	k = 0;
 	for (i = 0; i < node_pool_c; ++i)
@@ -250,15 +250,15 @@ struct teh_bsp* node_pool_to_teh_bsp()
  * compila e converte
  *
  */
-struct teh_bsp* teh_bspc(struct teh_model* model)
+struct beh* behc(struct teh* model)
 {
 	struct node* root;
-	struct teh_bsp* bsp;
+	struct beh* bsp;
 
-	root = bspc_teh_model(model);
+	root = bspc_teh(model);
 	assert (root);
 
-	bsp = node_pool_to_teh_bsp();
+	bsp = node_pool_to_beh();
 	assert (bsp);
 
 	return bsp;

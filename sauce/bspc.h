@@ -1,7 +1,7 @@
 #ifndef HAS_BSPC_H
 #define HAS_BSPC_H
 
-#include "teh_bsp.h"
+#include "beh.h"
 #include "tri.h"
 
 /*
@@ -30,7 +30,7 @@ struct node* node_alloc();
 void node_free(struct node* node);
 
 struct node* bspc(struct tri* list);
-struct teh_bsp* node_pool_to_teh_bsp();
-struct teh_bsp* teh_bspc(struct teh_model* model);
+struct beh* node_pool_to_beh();
+struct beh* behc(struct teh* model);
 
 #endif

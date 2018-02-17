@@ -42,10 +42,10 @@ SHADERS := \
 	build/r_vertex_shader.glsl.c
 
 LIB_OBJS := \
-	build/teh_model.o \
+	build/teh.o \
 	build/vec.o \
 	build/assets.o \
-	build/teh_bsp.o \
+	build/beh.o \
 
 GUI_OBJS := \
 	build/window.o \
@@ -53,8 +53,8 @@ GUI_OBJS := \
 	build/r_vertex_shader.glsl.o \
 	build/renderer.o \
 	build/controller.o \
-	build/r_teh_model.o \
-	build/r_teh_bsp.o \
+	build/r_teh.o \
+	build/r_beh.o \
 
 BSPC_OBJS := \
 	build/tri.o \
@@ -71,13 +71,13 @@ OBJS := \
 	$(BSPC_OBJS) \
 	$(CHECK_OBJS) \
 	build/check/check.o \
-	build/teh_bspc.o \
-	build/teh_engine.o \
+	build/behc.o \
+	build/engine.o \
 
 PRGS := \
 	build/check/check \
-	build/teh_bspc \
-	build/teh_engine
+	build/behc \
+	build/engine
 
 ALL_FILES := \
 	$(SHADERS) \
@@ -116,8 +116,8 @@ build/%.o: sauce/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # prgs
-build/teh_bspc: build/teh_bspc.o $(BSPC_OBJS) $(LIB_OBJS)
-build/teh_engine: build/teh_engine.o $(LIB_OBJS) $(GUI_OBJS)
+build/behc: build/behc.o $(BSPC_OBJS) $(LIB_OBJS)
+build/engine: build/engine.o $(LIB_OBJS) $(GUI_OBJS)
 build/check/check: build/check/check.o $(CHECK_OBJS) $(BSPC_OBJS) $(LIB_OBJS) $(GUI_OBJS)
 	mkdir -p `dirname $@`
 	$(LD) $(LDFLAGS) -o $@ $^

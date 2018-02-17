@@ -1,8 +1,8 @@
-#include "r_teh_bsp.h"
-#include "r_teh_model.h"
+#include "r_beh.h"
+#include "r_teh.h"
 #include "vec.h"
 
-static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const float* eye)
+static inline void draw_node(struct beh* bsp, struct beh_node* n, const float* eye)
 {
 	float h;
 
@@ -13,7 +13,7 @@ static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const 
 	{
 		/* folhas líquidass */
 		if (!n->is_solid)
-			r_teh_model(&bsp->model, 0, 0, 0, n->off, n->size);
+			r_teh(&bsp->model, 0, 0, 0, n->off, n->size);
 	}
 
 	else
@@ -34,7 +34,7 @@ static inline void draw_node(struct teh_bsp* bsp, struct teh_bsp_node* n, const 
 	}
 }
 
-void r_teh_bsp_from_eye(struct teh_bsp* bsp, const float* eye)
+void r_beh_from_eye(struct beh* bsp, const float* eye)
 {
 	glDisable(GL_DEPTH_TEST);
 	draw_node(bsp, bsp->nodes, eye);

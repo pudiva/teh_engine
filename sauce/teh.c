@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "renderer.h"
-#include "teh_model.h"
+#include "teh.h"
 
 #include <SDL_image.h>
 
@@ -40,10 +40,10 @@ static void print_vec2(float* x, FILE* fp)
 }
 
 /*
- * lê teh_model de uma fonte
+ * lê teh de uma fonte
  *
  */
-void teh_model_read(struct teh_model* x, FILE* fp)
+void teh_read(struct teh* x, FILE* fp)
 {
 	int i, j, k, r;
 
@@ -71,10 +71,10 @@ void teh_model_read(struct teh_model* x, FILE* fp)
 }
 
 /*
- * escreve teh_model em uma fonte
+ * escreve teh em uma fonte
  *
  */
-void teh_model_write(struct teh_model* x, FILE* fp)
+void teh_write(struct teh* x, FILE* fp)
 {
 	int i, j, k;
 
@@ -95,28 +95,28 @@ void teh_model_write(struct teh_model* x, FILE* fp)
 }
 
 /*
- * lê teh_model de um arquivo
+ * lê teh de um arquivo
  *
  */
-void teh_model_read_file(struct teh_model* x, const char* path)
+void teh_read_file(struct teh* x, const char* path)
 {
 	FILE* fp;
 	fp = fopen(path, "r");
 	assert (fp);
-	teh_model_read(x, fp);
+	teh_read(x, fp);
 	fclose(fp);
 }
 
 /*
- * escreve teh_model em um arquivo
+ * escreve teh em um arquivo
  *
  */
-void teh_model_write_file(struct teh_model* x, const char* path)
+void teh_write_file(struct teh* x, const char* path)
 {
 	FILE* fp;
 	fp = fopen(path, "w");
 	assert (fp);
-	teh_model_write(x, fp);
+	teh_write(x, fp);
 	fclose(fp);
 }
 
@@ -124,7 +124,7 @@ void teh_model_write_file(struct teh_model* x, const char* path)
  * liberdady
  *
  */
-void teh_model_free(struct teh_model* x)
+void teh_free(struct teh* x)
 {
 	free(x->tris);
 	free(x->texcoords);

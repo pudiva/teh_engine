@@ -2,7 +2,7 @@
 #define HAS_TRI_H
 
 #include <stdbool.h>
-#include "teh_model.h"
+#include "teh.h"
 
 /* NOTE: nomes curtos pq se nao fica tenso */
 struct tri
@@ -25,8 +25,8 @@ extern int tri_pool_c;
 
 struct tri* tri_alloc();
 
-struct tri* tri_from_teh_model(struct teh_model* model);
-struct teh_model* tri_to_teh_model(struct tri* list);
+struct tri* tri_from_teh(struct teh* model);
+struct teh* tri_to_teh(struct tri* list);
 
 /*
  * tri split

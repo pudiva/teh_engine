@@ -56,7 +56,7 @@ class TehModelExporter:
 
 class ExportTehModel(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     """Export Teh Model"""
-    bl_idname = "export_scene.teh_model"
+    bl_idname = "export_scene.teh"
     bl_label = "Export Teh Model"
     bl_options = {'REGISTER', 'UNDO'}
     filename_ext = ".teh"

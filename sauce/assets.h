@@ -2,11 +2,11 @@
 #define HAS_ASSETS_H
 
 #include <SDL_image.h>
-#include "teh_model.h"
-#include "teh_bsp.h"
+#include "teh.h"
+#include "beh.h"
 
-struct teh_model* teh_model_get(const char* path);
-struct teh_bsp* teh_bsp_get(const char* path);
+struct teh* teh_get(const char* path);
+struct beh* beh_get(const char* path);
 struct SDL_Surface* image_get(const char* path);
 
 #endif

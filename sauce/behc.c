@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <gvc.h>
 
-#include "teh_model.h"
+#include "teh.h"
 #include "bspc.h"
 #include "vec.h"
 #include "assets.h"
@@ -60,11 +60,11 @@ static void graph()
 
 int main(int argc, char *argv[])
 {
-	struct teh_model* model;
-	struct teh_bsp* bsp;
+	struct teh* model;
+	struct beh* bsp;
 
 	assert (argc == 3);
-	model = teh_model_get(argv[1]);
+	model = teh_get(argv[1]);
 
 	printf("compiling model with %d triangles and %d frames\n",
 			model->n_tris, model->n_frames);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	assert (0 < model->n_tris);
 	assert (0 < model->n_frames);
 
-	bsp = teh_bspc(model);
+	bsp = behc(model);
 	assert (bsp);
 
 	assert (0 < bsp->model.n_tris);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 	printf("bsp has %d nodes and %d triangles\n",
 			bsp->n_nodes, bsp->model.n_tris);
 
-	teh_bsp_write_file(bsp, argv[2]);
+	beh_write_file(bsp, argv[2]);
 	printf("written to %s\n", argv[2]);
 
 #ifdef GRAPH

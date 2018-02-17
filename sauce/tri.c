@@ -33,10 +33,10 @@ struct tri* tri_alloc()
 }
 
 /*
- * conversão entre teh_model
+ * conversão entre teh
  *
  */
-struct tri* tri_from_teh_model(struct teh_model* model)
+struct tri* tri_from_teh(struct teh* model)
 {
 	int i, j;
 	struct tri* list;
@@ -74,13 +74,13 @@ struct tri* tri_from_teh_model(struct teh_model* model)
 	return list;
 }
 
-struct teh_model* tri_to_teh_model(struct tri* list)
+struct teh* tri_to_teh(struct tri* list)
 {
 	int i, j;
 	struct tri* cur;
-	struct teh_model* model;
+	struct teh* model;
 
-	model = calloc(1, sizeof (struct teh_model));
+	model = calloc(1, sizeof (struct teh));
 
 	for (i = 0, cur = list; cur; ++i, cur = cur->next);
 

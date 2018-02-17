@@ -86,32 +86,32 @@ static inline void set(const char* path, void* stuff)
  * type loaders
  *
  */
-struct teh_model* teh_model_get(const char* path)
+struct teh* teh_get(const char* path)
 {
-	struct teh_model* model;
+	struct teh* model;
 
 	model = get(path);
 
 	if (!model)
 	{
-		model = calloc(1, sizeof (struct teh_model));
-		teh_model_read_file(model, path);
+		model = calloc(1, sizeof (struct teh));
+		teh_read_file(model, path);
 		set(path, model);
 	}
 
 	return model;
 }
 
-struct teh_bsp* teh_bsp_get(const char* path)
+struct beh* beh_get(const char* path)
 {
-	struct teh_bsp* bsp;
+	struct beh* bsp;
 
 	bsp = get(path);
 
 	if (!bsp)
 	{
-		bsp = calloc(1, sizeof (struct teh_bsp));
-		teh_bsp_read_file(bsp, path);
+		bsp = calloc(1, sizeof (struct beh));
+		beh_read_file(bsp, path);
 		set(path, bsp);
 	}
 
