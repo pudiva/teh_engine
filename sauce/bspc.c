@@ -16,7 +16,7 @@
 
 #ifdef DEBUG
 #include <stdio.h>
-#define p(c) fputc(s, stderr)
+#define p(c) fputc(c, stderr)
 #else
 #define p(c) ((void)0);
 #endif
