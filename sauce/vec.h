@@ -114,8 +114,8 @@ void mat4_magic_inv(const float (*A)[4], float (*B)[4]);
 #if DEBUG
 #include <stdio.h>
 #include <string.h>
-char* vec4_2_str(float *x);
-char* mat4_2_str(float (*A)[4]);
+char* vec4_2_str(const float *x);
+char* mat4_2_str(const float (*A)[4]);
 #endif
 
 #endif

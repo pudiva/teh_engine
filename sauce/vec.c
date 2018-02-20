@@ -322,14 +322,14 @@ void mat4_magic_inv(const float (*A)[4], float (*B)[4])
 #if DEBUG
 #include <stdio.h>
 #include <string.h>
-char* vec4_2_str(float *x)
+char* vec4_2_str(const float *x)
 {
 	static char str[128] = {0};
 	sprintf(str, "{% f,\t% f,\t% f,\t% f}", x[0], x[1], x[2], x[3]);
 	return str;
 }
 
-char* mat4_2_str(float (*A)[4])
+char* mat4_2_str(const float (*A)[4])
 {
 	static char str[1024] = {0};
 	str[0] = 0;
