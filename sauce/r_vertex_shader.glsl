@@ -5,16 +5,10 @@ attribute vec2 tex_coord;
 varying vec2 f_tex_coord;
 
 uniform float vertex_w;
+uniform mat4 modelview;
 
 void main()
 {
-	mat4 model = mat4(
-			1,	0,	0,	0,
-			0,	0,	-1,	0,
-			0,	1,	0,	0,
-			0,	0,	-5,	1
-			);
-
 	float r, t, l, b, n, f, k;
 
 	r =  1.0;
@@ -36,5 +30,5 @@ void main()
 	vec4 vertex = vec4(vertex1, 1);
 
 	f_tex_coord = tex_coord;
-	gl_Position = projection * model * vertex;
+	gl_Position = projection * modelview * vertex;
 }

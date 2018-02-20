@@ -4,7 +4,7 @@
 #include "renderer.h"
 
 GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
-GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_texture_sampler_loc;
+GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_modelview_loc, r_texture_sampler_loc;
 
 static GLuint r_shader_init(GLenum type, const GLchar* sauce, GLint len)
 {
@@ -112,6 +112,7 @@ void renderer_init()
 	glUseProgram(r_program_id);
 	r_texture_sampler_loc = glGetUniformLocation(r_program_id, "texture_sampler");
 	r_vertex_w_loc = glGetUniformLocation(r_program_id, "vertex_w");
+	r_modelview_loc = glGetUniformLocation(r_program_id, "modelview");
 	r_pos_loc = glGetUniformLocation(r_program_id, "pos");
 	r_color_loc = glGetUniformLocation(r_program_id, "color");
 

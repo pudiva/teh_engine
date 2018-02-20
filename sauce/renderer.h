@@ -5,7 +5,7 @@
 #include "teh.h"
 
 extern GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
-extern GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_texture_sampler_loc;
+extern GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_modelview_loc, r_texture_sampler_loc;
 
 extern unsigned char r_vertex_shader_glsl[], r_fragment_shader_glsl[];
 extern unsigned int r_vertex_shader_glsl_len, r_fragment_shader_glsl_len;
@@ -16,6 +16,7 @@ void renderer_fini();
 
 #define r_pos3fv(v) glUniform3fv(r_pos_loc, 1, (v))
 #define r_color4fv(v) glUniform4fv(r_color_loc, 1, (v))
+#define r_modelview(A) glUniformMatrix4fv(r_modelview_loc, 1, false, (A))
 #define r_clear(r, g, b, a) \
 { \
 	glClearColor(r, g, b, a); \
