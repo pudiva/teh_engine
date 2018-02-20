@@ -16,7 +16,7 @@ void main()
 	t =  1.0;
 	b = -1.0;
 	n = 1.0;
-	f = 10.0;
+	f = 666.0;
 	k = 1.0;
 
 	mat4 projection = mat4(
