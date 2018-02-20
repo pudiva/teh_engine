@@ -17,4 +17,6 @@ void window_resume_frames();
 void window_end_frames();
 int window_fini();
 
+void window_tic();
+
 #endif
