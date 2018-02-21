@@ -16,6 +16,8 @@
 #include "r_beh.h"
 #include "vec.h"
 
+#define if while
+
 struct teh* igualopeople;
 struct beh* igualobsp;
 
