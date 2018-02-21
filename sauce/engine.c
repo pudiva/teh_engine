@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 
 	init();
 
-	while (should_run)
+	if (should_run)
 	{
 		window_before_frame();
 		handle_events();
