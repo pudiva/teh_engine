@@ -15,6 +15,7 @@ CFLAGS := \
 	`pkg-config SDL2_mixer --cflags` \
 	`pkg-config check --cflags` \
 	`pkg-config libgvc --cflags` \
+	`pkg-config glesv2 --cflags` \
 	-std=c99 \
 	-Wall \
 	-pipe \
@@ -31,7 +32,7 @@ LDFLAGS := \
 	`pkg-config SDL2_mixer --libs` \
 	`pkg-config check --libs` \
 	`pkg-config libgvc --libs` \
-	-lGLESv2 \
+	`pkg-config glesv2 --libs` \
 	$(LDFLAGS)
 
 #
