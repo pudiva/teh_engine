@@ -63,10 +63,10 @@ struct test_case
 
 struct test_case cases[] =
 {
-	{.x = {&iso_xy, &iso_xy}, .t = {{0, 0, 0}, {0, 0, 1}}, .n=1},
-	{.x = {&iso_zx, &iso_zx}, .t = {{0, 0, 0}, {0, 1, 0}}, .n=1},
+	{.x = {&iso_xy, &iso_xy}, .t = {{0, 0, 0}, {0, 0, 1}}, .n=5},
+	{.x = {&iso_zx, &iso_zx}, .t = {{0, 0, 0}, {0, 1, 0}}, .n=5},
 
-	{.x = {&iso_xy, &iso_zx}, .t = {{0, 0, 0}, {0, 0, 0}}, .n=5},
+	{.x = {&iso_xy, &iso_zx}, .t = {{0, 0, 0}, {0, 0, 0}}, .n=7},
 };
 #define N_CASES (sizeof (cases) / sizeof (struct test_case))
 

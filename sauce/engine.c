@@ -188,7 +188,20 @@ void frame()
 
 	mat4_gemm(1, c_modelview, T_igualomapa, 0, M);
 	r_modelview(M[0]);
-	r_beh_from_eye(igualomapa, c_eye_pos);
+
+	float basis_inv[4][4] =
+	{
+		{ 1,  0,  0,  0},
+		{ 0,  0,  1,  0},
+		{ 0, -1,  0,  0},
+		{ 0,  0,  0,  1}
+	};
+
+	float p[4] = {0};
+
+	mat4_gemv(1, basis_inv, c_eye_pos, 0, p);
+
+	r_beh_from_eye(igualomapa, p);
 
 	mat4_gemm(1, c_modelview, T_igualopeople, 0, M);
 	r_modelview(M[0]);

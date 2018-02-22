@@ -32,7 +32,7 @@ struct teh* tri_to_teh(struct tri* list);
  * tri split
  *
  */
-extern int tri_split_count, tri_split_n_parts[3], tri_split_score;
+extern int tri_split_count, tri_split_n_parts[3], tri_split_score, tri_split_facing;
 extern struct tri* tri_split_parts[3];
 
 void tri_split_prepare(struct tri* src, float* plane);

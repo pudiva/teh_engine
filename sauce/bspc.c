@@ -46,9 +46,8 @@ void node_free(struct node* node)
 struct node* bspc(struct tri* list)
 {
 	struct tri* splitter, * best, * cur, * save;
-	struct tri* back, ** pback, * front, ** pfront;
+	struct tri* back, ** pback, * front, ** pfront, ***pwhat;
 	int score, score_best;
-	bool is_convex;
 	struct node* node;
 
 	p('+');
@@ -64,7 +63,6 @@ struct node* bspc(struct tri* list)
 	}
 
 	/* encontra melhor divisor e determina se a lista é convexa */
-	is_convex = true;
 	best = NULL;
 	score_best = INT_MAX;
 	for (splitter = list; splitter; splitter = splitter->next)
@@ -82,9 +80,6 @@ struct node* bspc(struct tri* list)
 
 			tri_split_prepare(cur, splitter->p);
 			score += tri_split_score;
-
-			if (0 < tri_split_count)
-				is_convex = false;
 		}
 
 		if (score < score_best)
@@ -94,8 +89,8 @@ struct node* bspc(struct tri* list)
 		}
 	}
 
-	/* folha líquida */
-	if (is_convex)
+	/* folha líquida e convexa */
+	if (!best)
 	{
 		p('L');
 		node->is_leaf = true;
@@ -133,16 +128,18 @@ struct node* bspc(struct tri* list)
 				pback = &(*pback)->next;
 		}
 
-		/* lista do plano -> lista da frente */
+		/* lista do plano */
 		if (tri_split_parts[1])
 		{
-			(*pfront) = tri_split_parts[1];
+			/* mermo lado -> pra frenty */
+			pwhat = tri_split_facing > 0 ? &pback : &pfront;
+			(**pwhat) = tri_split_parts[1];
 
-			while (*pfront)
+			while (**pwhat)
 			{
 				/* marca tudo nesse plano como usado! */
-				(*pfront)->used = true;
-				pfront = &(*pfront)->next;
+				(**pwhat)->used = true;
+				(*pwhat) = &(**pwhat)->next;
 			}
 		}
 

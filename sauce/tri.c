@@ -10,7 +10,7 @@
  * coisas públicas
  *
  */
-int tri_split_count, tri_split_n_parts[3], tri_split_score;
+int tri_split_count, tri_split_n_parts[3], tri_split_score, tri_split_facing;
 struct tri* tri_split_parts[3];
 
 #define n_splits tri_split_count
@@ -134,6 +134,8 @@ void tri_split_prepare(struct tri* src, float* plane)
 {
 	x = src;
 	p = plane;
+
+	tri_split_facing = vec3_dot(src->p, p);
 
 	h[0] = vec3_dot(x->v[0], p);
 	h[1] = vec3_dot(x->v[1], p);
