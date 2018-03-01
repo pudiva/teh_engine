@@ -47,6 +47,7 @@ LIB_OBJS := \
 	build/vec.o \
 	build/assets.o \
 	build/beh.o \
+	build/poly.o \
 
 GUI_OBJS := \
 	build/window.o \
@@ -63,6 +64,7 @@ BSPC_OBJS := \
 
 CHECK_OBJS := \
 	build/check/check.o \
+	build/check/check_poly.o \
 	build/check/check_tri_split.o \
 	build/check/check_bspc.o \
 
