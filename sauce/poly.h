@@ -3,6 +3,12 @@
 
 #include <stdbool.h>
 
+/*
+ * PISCINA DE POLÍGONOS!!1!1ONE!
+ *
+ */
+
+/* classificação de lado */
 enum side
 {
 	ON_PLANE = 1,
