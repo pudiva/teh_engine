@@ -38,7 +38,7 @@ struct poly
 /* resultado da comparação entre vértice e plano */
 struct vert_cmp 
 {
-	const struct vert* v;	/* vértice comparado */
+	struct vert* v;		/* vértice comparado */
 	const float* p;		/* plano */
 	float h;		/* altura */
 	int c;			/* lado do plano no qual o vértice está */
@@ -60,9 +60,20 @@ struct poly_cmp
 	enum side side;		/* lado(s) do plano nos quais o polígono está */
 };
 
-void vert_cmp(struct vert_cmp* vc, const struct vert* v, const float* p);
+void vert_cmp(struct vert_cmp* vc, struct vert* v, const float* p);
 void edge_cmp_next(struct edge_cmp* ec);
-void edge_cmp(struct edge_cmp* ec, const struct vert* v, const float* p);
+void edge_cmp(struct edge_cmp* ec, struct vert* v, const float* p);
 void poly_cmp(struct poly_cmp* pc, struct poly* poly, const float* p);
+
+struct vert* vert_dup(struct vert* v);
+struct poly* poly_dup(struct poly* poly);
+
+struct vert* vert_lerp(float w, struct vert* a, struct vert* b);
+
+void edge_split_winding(struct edge_cmp* ec, struct vert** a, struct vert** b);
+void poly_split_winding(struct poly_cmp* pc, struct poly** a, struct poly** b);
+
+void edge_split(struct edge_cmp* ec, struct vert** back, struct vert** front);
+void poly_split(struct poly_cmp* pc, struct poly** back, struct poly** front);
 
 #endif
