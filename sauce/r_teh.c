@@ -71,6 +71,7 @@ void r_teh(struct teh* x, float w, int f1, int f2, int off, int n)
 			NULL + x->vbo_texcoords_off + off * sizeof (float[3][2]));
 
 	glDrawArrays(GL_TRIANGLES, 0, 3*n);
+	glDrawArrays(GL_LINES, 0, 3*n);
 }
 
 void r_teh_at_time(struct teh* x, unsigned long t)

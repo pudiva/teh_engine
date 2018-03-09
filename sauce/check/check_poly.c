@@ -28,11 +28,13 @@ static float xy_planes[3][4] =
 	{  0,  0,  1,  1},
 };
 
+
 /*
  * quadrado
  *
  */
-static struct vert verts[4] =
+static struct vert verts[];
+static const struct vert verts_orig[] =
 {
 	{.pos = { 2,	 0,	 0}, .next = verts + 1},
 	{.pos = { 0,	 2,	 0}, .next = verts + 2},
@@ -40,12 +42,21 @@ static struct vert verts[4] =
 	{.pos = { 0,	-2,	 0}, .next = verts + 0},
 };
 
-static struct poly quadrado =
+static const struct poly quadrado_orig =
 {
 	.p = {0, 0, 1, 0},
 	.n_verts = 4,
 	.verts = verts,
 };
+
+static struct vert verts[sizeof (verts_orig)/sizeof(struct vert)];
+static struct poly quadrado;
+
+static void setup_quadrado()
+{
+	memcpy(verts, verts_orig, sizeof (verts_orig));
+	memcpy(&quadrado, &quadrado_orig, sizeof (quadrado_orig));
+}
 
 /*
  * vert_cmp
@@ -492,6 +503,7 @@ Suite* poly_suite()
 
 	s = suite_create("poly");
 	tc_isoceles = tcase_create("quadrado");
+	tcase_add_checked_fixture(tc_isoceles, setup_quadrado, NULL);
 
 	tcase_add_unchecked_fixture(tc_isoceles, poly_pool_init, NULL);
 	tcase_add_loop_test(tc_isoceles, test_vert_cmp, 0, N_VERT_CMP_CASES);

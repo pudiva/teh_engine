@@ -8,16 +8,19 @@
 static void inline scan_beh_node(int i, struct beh_node* n, FILE* fp)
 {
 	int r, back, front;
+	signed char is_leaf, is_solid; /* FIXME */
+
 	r = fscanf(fp, "%hhd %hhd %f %f %f %f %d %d %d %d\n",
-			(char*) &n[i].is_leaf, (char*) &n[i].is_solid,
-			n[i].plane, n[i].plane+1, n[i].plane+2, n[i].plane+3,
-			&n[i].off, &n[i].size,
+			&is_leaf, &is_solid,
+			n[i].plane+0, n[i].plane+1, n[i].plane+2, n[i].plane+3,
+			n[i].i+0, n[i].i+1,
 			&back, &front);
 
 	assert (r == 10);
 
-	n[i].back = -1 < back ? n + back : NULL;
-	n[i].front = -1 < front ? n + front : NULL;
+	n[i].type = is_solid ? SOLID_LEAF : (is_leaf ? LEAF : NON_LEAF);
+	n[i].kids[0] = -1 < back ? n + back : NULL;
+	n[i].kids[1] = -1 < front ? n + front : NULL;
 }
 
 void beh_read(struct beh* bsp, FILE* fp)
@@ -49,13 +52,14 @@ static void inline print_beh_node(int i, struct beh_node* n, FILE* fp)
 {
 	long back, front;
 
-	back = n[i].back ? (n[i].back - n) : -1;
-	front = n[i].front ? (n[i].front - n) : -1;
+	back = n[i].kids[0] ? (n[i].kids[0] - n) : -1;
+	front = n[i].kids[1] ? (n[i].kids[1] - n) : -1;
 
+	/* FIXME: is_leaf, is_solid */
 	fprintf(fp, "%hhd %hhd %f %f %f %f %d %d %ld %ld\n",
-			n[i].is_leaf, n[i].is_solid,
+			n[i].type & LEAF, (n[i].type & SOLID_LEAF) == SOLID_LEAF,
 			n[i].plane[0], n[i].plane[1], n[i].plane[2], n[i].plane[3],
-			n[i].off, n[i].size,
+			n[i].i[0], n[i].i[1],
 			back, front);
 }
 

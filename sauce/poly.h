@@ -33,6 +33,7 @@ struct poly
 	int n_verts;		/* número de vértices */
 	struct vert* verts;	/* aponta para o primeiro vértice */
 	struct poly* next;	/* aponta para o próximo polígono */
+	bool used;		/* compilador: usado como divisor? */
 };
 
 /* resultado da comparação entre vértice e plano */

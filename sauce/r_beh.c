@@ -9,11 +9,10 @@ static inline void draw_node(struct beh* bsp, struct beh_node* n, const float* e
 	if (!n) return;
 	h = vec3_dot(n->plane, eye);
 
-	if (n->is_leaf)
+	if ((n->type & LEAF) == LEAF)
 	{
 		/* folhas líquidass */
-		if (!n->is_solid)
-			r_teh(&bsp->model, 0, 0, 0, n->off, n->size);
+		r_teh(&bsp->model, 0, 0, 0, n->i[0], n->i[1]);
 	}
 
 	else
@@ -21,15 +20,15 @@ static inline void draw_node(struct beh* bsp, struct beh_node* n, const float* e
 		/* tamo atras */
 		if (h < n->plane[3])
 		{
-			draw_node(bsp, n->front, eye);
-			draw_node(bsp, n->back, eye);
+			draw_node(bsp, n->kids[1], eye);
+			draw_node(bsp, n->kids[0], eye);
 		}
 
 		/* tamo na frenty */
 		else
 		{
-			draw_node(bsp, n->back, eye);
-			draw_node(bsp, n->front, eye);
+			draw_node(bsp, n->kids[0], eye);
+			draw_node(bsp, n->kids[1], eye);
 		}
 	}
 }

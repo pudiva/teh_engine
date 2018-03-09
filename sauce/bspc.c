@@ -13,42 +13,191 @@
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
+#include <stdlib.h>
 
-#ifdef DEBUG
+//#define PRINTS
+
+#ifdef PRINTS
 #include <stdio.h>
 #define p(c) fputc(c, stderr)
 #else
 #define p(c) ((void)0);
 #endif
 
+#include "poly_pool.h"
+#include "poly.h"
 #include "bspc.h"
 #include "vec.h"
+#include "beh.h"
 
-struct node node_pool[BSPC_NODE_POOL_LEN];
+/*
+ * piscina de nodos
+ *
+ */
+struct beh_node node_pool[BSPC_NODE_POOL_LEN] = {0};
 int node_pool_c = 0;
 
-struct node* node_alloc()
+struct beh_node* node_alloc()
 {
 	assert (node_pool_c < BSPC_NODE_POOL_LEN);
-	memset(&node_pool[node_pool_c], 0, sizeof (struct node));
+	memset(&node_pool[node_pool_c], 0, sizeof (struct beh_node));
 	return &node_pool[node_pool_c++];
 }
 
-void node_free(struct node* node)
+/*
+ * pontua divisor
+ *
+ */
+static inline int split_score(struct poly* poly, const float* p)
 {
-	/* TODO */
+	struct poly_cmp pc;
+	struct poly* cur;
+	int back, front, split;
+
+	back = 0;
+	front = 0;
+	split = 0;
+	for (cur = poly; cur; cur = cur->next)
+	{
+		//p('t');
+		poly_cmp(&pc, cur, p);
+
+		switch (pc.side & SPLIT)
+		{
+		case BACK:  ++back;  break;
+		case FRONT: ++front; break;
+		case SPLIT: ++split; break;
+		}
+	}
+
+	return abs(back - front) * 8 + split * 6;
+}
+
+/*
+ * encontra divisor com melhor (menor) pontuação
+ *
+ */
+static inline struct poly* best_splitter(struct poly* poly)
+{
+	struct poly* cur, * best;
+	int score_best, score_cur;
+
+	assert (poly);
+
+	best = NULL;
+	score_best = INT_MAX;
+	for (cur = poly; cur; cur = cur->next)
+	{
+		assert (cur->next != cur);
+		//p('x');
+
+		if (cur->used)
+			continue;
+
+		score_cur = split_score(poly, cur->p);
+
+		if (score_cur < score_best)
+		{
+			best = cur;
+			score_best = score_cur;
+		}
+	}
+
+	return best;
+}
+
+/*
+ * divide 1 polígono
+ *
+ */
+static inline void split_one_poly(struct poly* poly, const float* p, struct poly** parts)
+{
+	struct poly_cmp pc;
+
+	assert (poly->next != poly);
+
+	poly_cmp(&pc, poly, p);
+
+	parts[0] = NULL;
+	parts[1] = NULL;
+
+	/* polígono exatamente no plano */
+	if (pc.side == ON_PLANE)
+	{
+		/* e apontando para o mesmo lado! */
+		if (0 < vec3_dot(poly->p, p))
+		{
+			poly->used = true;
+			parts[1] = poly;
+			return;
+		}
+
+		else
+		{
+			parts[0] = poly;
+			return;
+		}
+	}
+
+	/* divide o polígono */
+	switch (pc.side & SPLIT)
+	{
+	case SPLIT:
+		poly_split(&pc, parts+0, parts+1);
+		p('|');
+		break;
+
+	case BACK:
+		parts[0] = poly;
+		p('<');
+		break;
+
+	default:
+		parts[1] = poly;
+		p('>');
+		break;
+	}
+}
+
+/*
+ * divide lista de poligonosss
+ *
+ */
+static inline void split_polys(struct poly* poly, const float* p, struct poly** parts)
+{
+	struct poly* cur, * next, * new[2];
+
+	parts[0] = NULL;
+	parts[1] = NULL;
+	for (cur = poly; cur; cur = next)
+	{
+		next = cur->next;
+		assert (cur != next);
+
+		split_one_poly(cur, p, new);
+
+		if (new[0])
+		{
+			new[0]->next = parts[0];
+			parts[0] = new[0];
+		}
+
+		if (new[1])
+		{
+			new[1]->next = parts[1];
+			parts[1] = new[1];
+		}
+	}
 }
 
 /*
  * compiler!11!!1
  *
  */
-struct node* bspc(struct tri* list)
+struct beh_node* behc_node(struct poly* list)
 {
-	struct tri* splitter, * best, * cur, * save;
-	struct tri* back, ** pback, * front, ** pfront, ***pwhat;
-	int score, score_best;
-	struct node* node;
+	struct poly* parts[2], * best;
+	struct beh_node* node;
 
 	p('+');
 	node = node_alloc();
@@ -57,189 +206,174 @@ struct node* bspc(struct tri* list)
 	if (!list)
 	{
 		p('S');
-		node->is_leaf = true;
-		node->is_solid = true;
+		node->type = SOLID_LEAF;
 		return node;
 	}
 
-	/* encontra melhor divisor e determina se a lista é convexa */
-	best = NULL;
-	score_best = INT_MAX;
-	for (splitter = list; splitter; splitter = splitter->next)
-	{
-		p('x');
-
-		if (splitter->used)
-			continue;
-
-		score = 0;
-		for (cur = list; cur; cur = cur->next)
-		{
-			p('t');
-			assert (cur->next != cur);
-
-			tri_split_prepare(cur, splitter->p);
-			score += tri_split_score;
-		}
-
-		if (score < score_best)
-		{
-			best = splitter;
-			score_best = score;
-		}
-	}
+	best = best_splitter(list);
 
 	/* folha líquida e convexa */
 	if (!best)
 	{
 		p('L');
-		node->is_leaf = true;
-		node->is_solid = false;
-		node->tris = list;
+		node->type = LIQUID_LEAF;
+		node->polys = list;
 		return node;
 	}
 
 	p('N');
-
-	back = NULL;
-	front = NULL;
-	pback = &back;
-	pfront = &front;
-
 	vec4_copy(best->p, node->plane);
-
-	/* divide todos os triangulos com o melhor divisor encontrado */
-	for (cur = list; cur; cur = save)
-	{
-		assert (cur != cur->next);
-		save = cur->next;
-		cur->next = NULL;
-
-		tri_split_prepare(cur, best->p);
-		tri_split();
-		p('s');
-
-		/* lista de tras */
-		if (tri_split_parts[0])
-		{
-			(*pback) = tri_split_parts[0];
-
-			while (*pback)
-				pback = &(*pback)->next;
-		}
-
-		/* lista do plano */
-		if (tri_split_parts[1])
-		{
-			/* mermo lado -> pra frenty */
-			pwhat = tri_split_facing > 0 ? &pback : &pfront;
-			(**pwhat) = tri_split_parts[1];
-
-			while (**pwhat)
-			{
-				/* marca tudo nesse plano como usado! */
-				(**pwhat)->used = true;
-				(*pwhat) = &(**pwhat)->next;
-			}
-		}
-
-		/* lista da frente */
-		if (tri_split_parts[2])
-		{
-			(*pfront) = tri_split_parts[2];
-
-			while (*pfront)
-				pfront = &(*pfront)->next;
-		}
-	}
+	best->used = true;
+	split_polys(list, best->p, parts);
 
 	/* inception */
-	node->back = bspc(back);
-	node->front = bspc(front);
+	node->kids[0] = behc_node(parts[0]);
+	node->kids[1] = behc_node(parts[1]);
 	return node;
+}
+
+/*
+ * poly_from_teh
+ *
+ */
+struct poly* poly_from_teh(struct teh* model)
+{
+	int i, j;
+	struct poly* list;
+	struct poly** pp;
+	struct vert** pv;
+	float e1[3], e2[3];
+
+	pp = &list;
+	list = NULL;
+	for (i = 0; i < model->n_tris; ++i)
+	{
+		(*pp) = poly_alloc();
+		(**pp).n_verts = 3;
+		(**pp).next = NULL;
+		(**pp).used = false;
+
+		/* copia os vertice */
+		for (j = 0, pv = &(**pp).verts; j < 3; ++j, pv = &(**pv).next)
+		{
+			(*pv) = vert_alloc();
+			vec3_copy(model->tris[i][j], (**pv).pos);
+			vec2_copy(model->texcoords[i][j], (**pv).texcoords);
+		}
+
+		/* fecha o ciclo */
+		(*pv) = (**pp).verts;
+
+		vec3_copy((**pp).verts->next->pos, e1);
+		vec3_axpy(-1, (**pp).verts->pos, e1);
+
+		vec3_copy((**pp).verts->next->next->pos, e2);
+		vec3_axpy(-1, (**pp).verts->pos, e2);
+
+		vec3_cross(e1, e2, (**pp).p);
+		vec3_normalize((**pp).p);
+		(**pp).p[3] = vec3_dot((**pp).verts->pos, (**pp).p);
+
+		assert ((**pp).next != (*pp));
+		pp = &(**pp).next;
+	}
+
+	return list;
 }
 
 /*
  * compila teh
  *
  */
-struct node* bspc_teh(struct teh* model)
+struct beh_node* bspc_teh(struct teh* model)
 {
-	struct tri* list;
-	struct node* node;
+	struct poly* list;
+	struct beh_node* node;
 
-	list = tri_from_teh(model);
+	list = poly_from_teh(model);
 	assert (list);
 
-	node = bspc(list);
+	node = behc_node(list);
 	assert (node);
 
 	return node;
 }
 
 /*
- * converte para teh
+ * conta triângulos
  *
  */
-static inline int convert_node(
-		int i,
-		int k,
-		struct beh_node* d,
-		float (*tc)[3][2],
-		float (*v)[3][3],
-		struct node* s
-		)
+static inline int count_tris(struct beh_node* node)
 {
-	int j;
-	struct tri* t;
+	struct poly* cur;
+	int n;
 
-	d[i].is_leaf = s[i].is_leaf;
-	d[i].is_solid = s[i].is_solid;
-	vec4_copy(s[i].plane, d[i].plane);
-	d[i].back = s[i].back ? d + (s[i].back - s) : NULL;
-	d[i].front = s[i].front ? d + (s[i].front - s) : NULL;
+	if (!node)
+		return 0;
 
-	/* folha líquida */
-	if (s[i].is_leaf && !s[i].is_solid)
+	n = 0;
+	for (cur = node->polys; cur; cur = cur->next)
+		n += cur->n_verts-2;
+
+	n += count_tris(node->kids[0]);
+	n += count_tris(node->kids[1]);
+	return n;
+}
+
+static inline void put_poly_tris(struct teh* teh, struct poly* poly)
+{
+	register int i;
+	struct vert* v[3];
+
+	v[0] = poly->verts;
+	i = 0;
+	for (v[1] = v[0]->next, v[2] = v[1]->next; v[2] != v[0]; v[1] = v[1]->next, v[2] = v[2]->next)
 	{
-		d[i].off = k;
-		d[i].size = 0;
-
-		for (t = s[i].tris; t; t = t->next)
+		for (i = 0; i < 3; ++i)
 		{
-			for (j = 0; j < 3; ++j)
-			{
-				vec2_copy(t->tc[j], tc[k][j]);
-				vec3_copy(t->v[j], v[k][j]);
-			}
-			++k;
-			++d[i].size;
+			vec3_copy(v[i]->pos, teh->tris[teh->n_tris][i]);
+			vec2_copy(v[i]->texcoords, teh->texcoords[teh->n_tris][i]);
 		}
+		++teh->n_tris;
 	}
+}
 
-	return k;
+static inline void put_node_tris(struct teh* teh, struct beh_node* node)
+{
+	struct poly* cur;
+
+	if (!node)
+		return;
+
+	node->i[0] = teh->n_tris;
+
+	for (cur = node->polys; cur; cur = cur->next)
+		put_poly_tris(teh, cur);
+
+	node->i[1] = teh->n_tris - node->i[0];
+
+	put_node_tris(teh, node->kids[0]);
+	put_node_tris(teh, node->kids[1]);
 }
 
 struct beh* node_pool_to_beh()
 {
-	int i, k;
+	int n_tris;
 	struct beh* bsp;
 
 	bsp = calloc(1, sizeof (struct beh));
 
-	bsp->model.n_tris = tri_pool_c;
+	n_tris = count_tris(node_pool+0);
+	bsp->model.tris = calloc(n_tris, sizeof (float[3][3]));
+	bsp->model.texcoords = calloc(n_tris, sizeof (float[3][2]));
+
+	put_node_tris(&bsp->model, node_pool+0);
+	assert (bsp->model.n_tris == n_tris);
+
 	bsp->model.n_frames = 1;
-	bsp->model.tris = calloc(bsp->model.n_tris, sizeof (float[3][3]));
-	bsp->model.texcoords = calloc(bsp->model.n_tris, sizeof (float[3][2]));
+
 	bsp->n_nodes = node_pool_c;
-	bsp->nodes = calloc(node_pool_c, sizeof (struct beh_node));
-
-	k = 0;
-	for (i = 0; i < node_pool_c; ++i)
-		k = convert_node(i, k, bsp->nodes, bsp->model.texcoords, bsp->model.tris, node_pool);
-
-	assert (k == tri_pool_c);
-
+	bsp->nodes = node_pool;
 	return bsp;
 }
 
@@ -249,7 +383,7 @@ struct beh* node_pool_to_beh()
  */
 struct beh* behc(struct teh* model)
 {
-	struct node* root;
+	struct beh_node* root;
 	struct beh* bsp;
 
 	root = bspc_teh(model);

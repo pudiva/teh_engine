@@ -6,12 +6,15 @@
 #include "bspc.h"
 #include "vec.h"
 #include "assets.h"
+#include "poly_pool.h"
 
-struct node* root;
+struct beh_node* root;
+
+#define GRAPH
 
 #ifdef GRAPH
 graph_t *g;
-static Agnode_t* graph_node(struct node* n)
+static Agnode_t* graph_node(struct beh_node* n)
 {
 	Agnode_t* agn, * agn_b, * agn_f;
 	char name[16];
@@ -21,11 +24,11 @@ static Agnode_t* graph_node(struct node* n)
 
 	sprintf(name, "%ld: %c",
 			n - node_pool,
-			n->is_leaf ? (n->is_solid ? 'S' : 'L') : 'N');
+			n->type & LEAF ? (n->type & SOLID_LEAF ? 'S' : 'L') : 'N');
 
 	agn = agnode(g, name, 1);
-	agn_b = graph_node(n->back);
-	agn_f = graph_node(n->front);
+	agn_b = graph_node(n->kids[0]);
+	agn_f = graph_node(n->kids[1]);
 
 	if (agn_b)
 		agedge(g, agn, agn_b, 0, 1);
@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
 	assert (0 < model->n_tris);
 	assert (0 < model->n_frames);
 
+	poly_pool_init();
 	bsp = behc(model);
 	assert (bsp);
 
@@ -85,7 +89,8 @@ int main(int argc, char *argv[])
 	printf("written to %s\n", argv[2]);
 
 #ifdef GRAPH
-	//graph();
+	root = node_pool;
+	graph();
 #endif
 
 	return 0;
