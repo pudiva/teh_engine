@@ -4,7 +4,7 @@
 #include "poly.h"
 
 #define POLY_POOL_SIZE 66666
-#define VERT_POOL_SIZE 66666
+#define VERT_POOL_SIZE 3*POLY_POOL_SIZE
 
 struct poly* poly_alloc();
 void poly_free(struct poly* poly);
