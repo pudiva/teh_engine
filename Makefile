@@ -84,10 +84,30 @@ PRGS := \
 	build/behc \
 	build/engine
 
+TEHS := \
+	tehs/blorl.teh \
+	tehs/crossing_quads.teh \
+	tehs/igualomagic.teh \
+	tehs/igualomapa.teh \
+	tehs/igualopeople.teh \
+	tehs/parallel_quads.teh \
+	tehs/zoing.teh \
+
+BEHS := \
+	behs/blorl.beh \
+	behs/crossing_quads.beh \
+	behs/igualomagic.beh \
+	behs/igualomapa.beh \
+	behs/parallel_quads.beh \
+	behs/zoing.beh \
+	#behs/igualopeople.beh
+
 ALL_FILES := \
 	$(SHADERS) \
 	$(OBJS) \
 	$(PRGS) \
+	$(TEHS) \
+	$(BEHS) \
 
 #
 # recipes
@@ -102,6 +122,19 @@ clean:
 
 check: build/check/check
 	$^
+
+tehs: $(TEHS)
+behs: $(BEHS)
+
+# exporta modelos
+tehs/%.teh: blends/%.blend
+	mkdir -p `dirname $@`
+	blender $< -b -P sauce/teh_export_cli.py -- $@
+
+# compila mapas
+behs/%.beh: tehs/%.teh build/behc
+	mkdir -p `dirname $@`
+	build/behc $< $@
 
 # shaders
 build/%.glsl.c: sauce/%.glsl
