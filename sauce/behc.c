@@ -10,7 +10,7 @@
 
 struct beh_node* root;
 
-#define GRAPH
+//#define GRAPH
 
 #ifdef GRAPH
 graph_t *g;
