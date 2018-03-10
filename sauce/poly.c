@@ -116,7 +116,8 @@ void edge_split_winding(struct edge_cmp* ec, struct vert** a, struct vert** b)
 {
 	float w;
 
-	/* BUGADO */
+	/* BUGADO não ta nem na frente nem atras*/
+	/* TODO: poligonos degenerados? */
 	assert (ec->side & SPLIT);
 
 	/* divide a parada */
