@@ -47,8 +47,19 @@ void fini()
  *
  */
 static float c_look_angles[4] = {0};
+static bool c_look_mouse = false;
+
+static void c_look_mouse_toggle()
+{
+	c_look_mouse = !c_look_mouse;
+	SDL_SetRelativeMouseMode(c_look_mouse);
+}
+
 static void c_look_handle(SDL_Event* ev)
 {
+	if (!c_look_mouse)
+		return;
+
 	if (ev->type != SDL_MOUSEMOTION)
 		return;
 
@@ -129,6 +140,7 @@ static void c_flags_handle(SDL_Event* ev)
 	case SDLK_w: r_wireframe = !r_wireframe; break;
 	case SDLK_f: full_beh = !full_beh; break;
 	case SDLK_n: next_leaf(ev->key.keysym.mod & KMOD_SHIFT ? -1 : 1); break;
+	case SDLK_m: c_look_mouse_toggle(); break;
 	}
 }
 
