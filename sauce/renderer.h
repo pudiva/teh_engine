@@ -3,9 +3,11 @@
 
 #include <SDL_opengles2.h>
 #include "teh.h"
+#include <stdbool.h>
 
 extern GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
 extern GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_modelview_loc, r_texture_sampler_loc;
+extern bool r_wireframe;
 
 extern unsigned char r_vertex_shader_glsl[], r_fragment_shader_glsl[];
 extern unsigned int r_vertex_shader_glsl_len, r_fragment_shader_glsl_len;

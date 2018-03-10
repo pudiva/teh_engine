@@ -16,6 +16,7 @@
 #include "r_beh.h"
 #include "vec.h"
 
+/* otimização do ramon */
 #define if while
 
 struct teh* igualopeople;
@@ -29,8 +30,8 @@ void init()
 	igualomapa = beh_get("igualomapa.beh");
 	assert (igualomapa);
 
-	igualopeople->texture = image_get("igualopeople.png");
-	igualomapa->model.texture = image_get("igualopeople.png");
+	igualopeople->texture = image_get("textures/igualopeople.png");
+	igualomapa->model.texture = image_get("textures/igualopeople.png");
 	assert (igualopeople->texture);
 
 	r_teh_load_all(igualopeople);
@@ -58,10 +59,10 @@ static void c_look_handle(SDL_Event* ev)
 }
 
 /*
- * fas o boneco anda com hjkl
+ * fas o boneco anda com hjkl espaço e z
  *
  */
-static int c_walk_i[4] = {0};
+static int c_walk_i[6] = {0};
 static float c_walk_dir[4] = {0};
 static void c_walk_handle(SDL_Event* ev)
 {
@@ -80,14 +81,55 @@ static void c_walk_handle(SDL_Event* ev)
 	case SDLK_j: c_walk_i[1] = v; break;
 	case SDLK_k: c_walk_i[2] = v; break;
 	case SDLK_l: c_walk_i[3] = v; break;
+	case SDLK_SPACE: c_walk_i[4] = v; break;
+	case SDLK_b: c_walk_i[5] = v; break;
 	default: return;
 	}
 
 	c_walk_dir[0] = c_walk_i[3] - c_walk_i[0];
-	c_walk_dir[1] = 0;
+	c_walk_dir[1] = c_walk_i[4] - c_walk_i[5];
 	c_walk_dir[2] = c_walk_i[1] - c_walk_i[2];
 	c_walk_dir[3] = 0;
 	vec4_normalize(c_walk_dir);
+}
+
+/*
+ * ativa e desativa paradineas
+ *
+ */
+static int i_node = 0;
+static bool full_beh = true;
+
+static void inline next_leaf(int i)
+{
+	if (i == -1)
+	{
+		i = igualomapa->n_nodes - 1;
+		break;
+	}
+
+	if (true)
+	{
+		i_node = (i_node + i) % igualomapa->n_nodes;
+		if (igualomapa->nodes[i_node].type == LIQUID_LEAF)
+			return;
+	}
+}
+
+static void c_flags_handle(SDL_Event* ev)
+{
+	switch (ev->type)
+	{
+	case SDL_KEYDOWN: break;
+	default: return;
+	}
+
+	switch (ev->key.keysym.sym)
+	{
+	case SDLK_w: r_wireframe = !r_wireframe; break;
+	case SDLK_f: full_beh = !full_beh; break;
+	case SDLK_n: next_leaf(ev->key.keysym.mod & KMOD_SHIFT ? -1 : 1); break;
+	}
 }
 
 /*
@@ -99,7 +141,7 @@ static void c_poll()
 {
 	SDL_Event ev;
 
-	while (SDL_PollEvent(&ev))
+	if (SDL_PollEvent(&ev))
 	{
 		switch (ev.type)
 		{
@@ -111,6 +153,7 @@ static void c_poll()
 		default:
 			c_look_handle(&ev);
 			c_walk_handle(&ev);
+			c_flags_handle(&ev);
 		}
 	}
 }
@@ -201,7 +244,18 @@ void frame()
 
 	mat4_gemv(1, basis_inv, c_eye_pos, 0, p);
 
-	r_beh_from_eye(igualomapa, p);
+	if (full_beh)
+	{
+		r_beh_from_eye(igualomapa, p);
+		break;
+	}
+
+	if (!full_beh)
+	{
+		r_teh(&igualomapa->model, 0, 0, 0, igualomapa->nodes[i_node].i[0], igualomapa->nodes[i_node].i[1]);
+		break;
+	}
+
 
 	mat4_gemm(1, c_modelview, T_igualopeople, 0, M);
 	r_modelview(M[0]);

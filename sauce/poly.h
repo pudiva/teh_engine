@@ -13,8 +13,11 @@ enum side
 {
 	ON_PLANE = 1,
 	BACK = 2,
+	ON_PLANE_AND_BACK = 3,
 	FRONT = 4,
+	ON_PLANE_AND_FRONT = 5,
 	SPLIT = 6,
+	ON_PLANT_AND_SPLIT = 7,
 };
 
 /* vértice */

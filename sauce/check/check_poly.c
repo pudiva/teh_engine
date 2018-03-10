@@ -10,8 +10,10 @@
  * planos de divisão
  *
  */
-static float yz_planes[7][4] =
+static float yz_planes[11][4] =
 {
+	{  1,  0,  0, -5},
+	{  1,  0,  0, -4},
 	{  1,  0,  0, -3},
 	{  1,  0,  0, -2},
 	{  1,  0,  0, -1},
@@ -19,6 +21,8 @@ static float yz_planes[7][4] =
 	{  1,  0,  0,  1},
 	{  1,  0,  0,  2},
 	{  1,  0,  0,  3},
+	{  1,  0,  0,  4},
+	{  1,  0,  0,  5},
 };
 
 static float xy_planes[3][4] =
@@ -36,10 +40,10 @@ static float xy_planes[3][4] =
 static struct vert verts[];
 static const struct vert verts_orig[] =
 {
-	{.pos = { 2,	 0,	 0}, .next = verts + 1},
-	{.pos = { 0,	 2,	 0}, .next = verts + 2},
-	{.pos = {-2,	 0,	 0}, .next = verts + 3},
-	{.pos = { 0,	-2,	 0}, .next = verts + 0},
+	{.pos = { 4,	 0,	 0}, .next = verts + 1},
+	{.pos = { 0,	 4,	 0}, .next = verts + 2},
+	{.pos = {-4,	 0,	 0}, .next = verts + 3},
+	{.pos = { 0,	-4,	 0}, .next = verts + 0},
 };
 
 static const struct poly quadrado_orig =
@@ -76,40 +80,66 @@ static struct vert_cmp_case vert_cmp_cases[] =
 	/* v		p		h	 c	side */
 
 	/* eixo x */
-	{verts+0,	yz_planes[0],	 2,	 1,	FRONT},
-	{verts+1,	yz_planes[0],	 0,	 1,	FRONT},
-	{verts+2,	yz_planes[0],	-2,	 1,	FRONT},
-	{verts+3,	yz_planes[0],	 0,	 1,	FRONT},
+	{verts+0,	yz_planes[ 0],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 0],	 0,	 1,	FRONT},
+	{verts+2,	yz_planes[ 0],	-4,	 1,	FRONT},
+	{verts+3,	yz_planes[ 0],	 0,	 1,	FRONT},
 
-	{verts+0,	yz_planes[1],	 2,	 1,	FRONT},
-	{verts+1,	yz_planes[1],	 0,	 1,	FRONT},
-	{verts+2,	yz_planes[1],	-2,	 0,	ON_PLANE},
-	{verts+3,	yz_planes[1],	 0,	 1,	FRONT},
+	{verts+0,	yz_planes[ 1],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 1],	 0,	 1,	FRONT},
+	{verts+2,	yz_planes[ 1],	-4,	 0,	ON_PLANE},
+	{verts+3,	yz_planes[ 1],	 0,	 1,	FRONT},
 
-	{verts+0,	yz_planes[2],	 2,	 1,	FRONT},
+	{verts+0,	yz_planes[ 2],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 2],	 0,	 1,	FRONT},
+	{verts+2,	yz_planes[ 2],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 2],	 0,	 1,	FRONT},
+
+	{verts+0,	yz_planes[ 3],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 3],	 0,	 1,	FRONT},
+	{verts+2,	yz_planes[ 3],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 3],	 0,	 1,	FRONT},
+
+	{verts+0,	yz_planes[ 4],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 4],	 0,	 1,	FRONT},
+	{verts+2,	yz_planes[ 4],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 4],	 0,	 1,	FRONT},
+
+	{verts+0,	yz_planes[ 5],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 5],	 0,	 0,	ON_PLANE},
+	{verts+2,	yz_planes[ 5],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 5],	 0,	 0,	ON_PLANE},
+
+	{verts+0,	yz_planes[ 6],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 6],	 0,	-1,	BACK},
+	{verts+2,	yz_planes[ 6],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 6],	 0,	-1,	BACK},
+
+	{verts+0,	yz_planes[ 7],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 7],	 0,	-1,	BACK},
+	{verts+2,	yz_planes[ 7],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 7],	 0,	-1,	BACK},
+
+	{verts+0,	yz_planes[ 8],	 4,	 1,	FRONT},
+	{verts+1,	yz_planes[ 8],	 0,	-1,	BACK},
+	{verts+2,	yz_planes[ 8],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 8],	 0,	-1,	BACK},
+
+	{verts+0,	yz_planes[ 9],	 4,	 0,	ON_PLANE},
+	{verts+1,	yz_planes[ 9],	 0,	-1,	BACK},
+	{verts+2,	yz_planes[ 9],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[ 9],	 0,	-1,	BACK},
+
+	{verts+0,	yz_planes[10],	 4,	-1,	BACK},
+	{verts+1,	yz_planes[10],	 0,	-1,	BACK},
+	{verts+2,	yz_planes[10],	-4,	-1,	BACK},
+	{verts+3,	yz_planes[10],	 0,	-1,	BACK},
+
+	/* testa da metade do lado */
+	{verts+0,	yz_planes[2],	 4,	 1,	FRONT},
 	{verts+1,	yz_planes[2],	 0,	 1,	FRONT},
-	{verts+2,	yz_planes[2],	-2,	-1,	BACK},
+	{verts+2,	yz_planes[2],	-4,	-1,	BACK},
 	{verts+3,	yz_planes[2],	 0,	 1,	FRONT},
-
-	{verts+0,	yz_planes[3],	 2,	 1,	FRONT},
-	{verts+1,	yz_planes[3],	 0,	 0,	ON_PLANE},
-	{verts+2,	yz_planes[3],	-2,	-1,	BACK},
-	{verts+3,	yz_planes[3],	 0,	 0,	ON_PLANE},
-
-	{verts+0,	yz_planes[4],	 2,	 1,	FRONT},
-	{verts+1,	yz_planes[4],	 0,	-1,	BACK},
-	{verts+2,	yz_planes[4],	-2,	-1,	BACK},
-	{verts+3,	yz_planes[4],	 0,	-1,	BACK},
-
-	{verts+0,	yz_planes[5],	 2,	 0,	ON_PLANE},
-	{verts+1,	yz_planes[5],	 0,	-1,	BACK},
-	{verts+2,	yz_planes[5],	-2,	-1,	BACK},
-	{verts+3,	yz_planes[5],	 0,	-1,	BACK},
-
-	{verts+0,	yz_planes[6],	 2,	-1,	BACK},
-	{verts+1,	yz_planes[6],	 0,	-1,	BACK},
-	{verts+2,	yz_planes[6],	-2,	-1,	BACK},
-	{verts+3,	yz_planes[6],	 0,	-1,	BACK},
 
 	/* eixo z */                 	
 	{verts+0,	xy_planes[0],	 0,	 1,	FRONT},
@@ -160,56 +190,76 @@ static struct edge_cmp_case edge_cmp_cases[] =
 	/* v		p		side */
 
 	/* eixo x */
-	{verts+0,	yz_planes[0],	FRONT},
-	{verts+1,	yz_planes[0],	FRONT},
-	{verts+2,	yz_planes[0],	FRONT},
-	{verts+3,	yz_planes[0],	FRONT},
+	{verts+0,	yz_planes[ 0],	FRONT},
+	{verts+1,	yz_planes[ 0],	FRONT},
+	{verts+2,	yz_planes[ 0],	FRONT},
+	{verts+3,	yz_planes[ 0],	FRONT},
 
-	{verts+0,	yz_planes[1],	FRONT},
-	{verts+1,	yz_planes[1],	ON_PLANE | FRONT},
-	{verts+2,	yz_planes[1],	ON_PLANE | FRONT},
-	{verts+3,	yz_planes[1],	FRONT},
+	{verts+0,	yz_planes[ 1],	FRONT},
+	{verts+1,	yz_planes[ 1],	ON_PLANE | FRONT},
+	{verts+2,	yz_planes[ 1],	ON_PLANE | FRONT},
+	{verts+3,	yz_planes[ 1],	FRONT},
 
-	{verts+0,	yz_planes[2],	FRONT},
-	{verts+1,	yz_planes[2],	BACK | FRONT},
-	{verts+2,	yz_planes[2],	BACK | FRONT},
-	{verts+3,	yz_planes[2],	FRONT},
+	{verts+0,	yz_planes[ 2],	FRONT},
+	{verts+1,	yz_planes[ 2],	BACK | FRONT},
+	{verts+2,	yz_planes[ 2],	BACK | FRONT},
+	{verts+3,	yz_planes[ 2],	FRONT},
 
-	{verts+0,	yz_planes[3],	ON_PLANE | FRONT},
-	{verts+1,	yz_planes[3],	ON_PLANE | BACK},
-	{verts+2,	yz_planes[3],	ON_PLANE | BACK},
-	{verts+3,	yz_planes[3],	ON_PLANE | FRONT},
+	{verts+0,	yz_planes[ 3],	FRONT},
+	{verts+1,	yz_planes[ 3],	BACK | FRONT},
+	{verts+2,	yz_planes[ 3],	BACK | FRONT},
+	{verts+3,	yz_planes[ 3],	FRONT},
 
-	{verts+0,	yz_planes[4],	BACK | FRONT},
-	{verts+1,	yz_planes[4],	BACK},
-	{verts+2,	yz_planes[4],	BACK},
-	{verts+3,	yz_planes[4],	BACK | FRONT},
+	{verts+0,	yz_planes[ 4],	FRONT},
+	{verts+1,	yz_planes[ 4],	BACK | FRONT},
+	{verts+2,	yz_planes[ 4],	BACK | FRONT},
+	{verts+3,	yz_planes[ 4],	FRONT},
 
-	{verts+0,	yz_planes[5],	ON_PLANE | BACK},
-	{verts+1,	yz_planes[5],	BACK},
-	{verts+2,	yz_planes[5],	BACK},
-	{verts+3,	yz_planes[5],	ON_PLANE | BACK},
+	{verts+0,	yz_planes[ 5],	ON_PLANE | FRONT},
+	{verts+1,	yz_planes[ 5],	ON_PLANE | BACK},
+	{verts+2,	yz_planes[ 5],	ON_PLANE | BACK},
+	{verts+3,	yz_planes[ 5],	ON_PLANE | FRONT},
 
-	{verts+0,	yz_planes[6],	BACK},
-	{verts+1,	yz_planes[6],	BACK},
-	{verts+2,	yz_planes[6],	BACK},
-	{verts+3,	yz_planes[6],	BACK},
+	{verts+0,	yz_planes[ 6],	BACK | FRONT},
+	{verts+1,	yz_planes[ 6],	BACK},
+	{verts+2,	yz_planes[ 6],	BACK},
+	{verts+3,	yz_planes[ 6],	BACK | FRONT},
+
+	{verts+0,	yz_planes[ 7],	BACK | FRONT},
+	{verts+1,	yz_planes[ 7],	BACK},
+	{verts+2,	yz_planes[ 7],	BACK},
+	{verts+3,	yz_planes[ 7],	BACK | FRONT},
+
+	{verts+0,	yz_planes[ 8],	BACK | FRONT},
+	{verts+1,	yz_planes[ 8],	BACK},
+	{verts+2,	yz_planes[ 8],	BACK},
+	{verts+3,	yz_planes[ 8],	BACK | FRONT},
+
+	{verts+0,	yz_planes[ 9],	ON_PLANE | BACK},
+	{verts+1,	yz_planes[ 9],	BACK},
+	{verts+2,	yz_planes[ 9],	BACK},
+	{verts+3,	yz_planes[ 9],	ON_PLANE | BACK},
+
+	{verts+0,	yz_planes[10],	BACK},
+	{verts+1,	yz_planes[10],	BACK},
+	{verts+2,	yz_planes[10],	BACK},
+	{verts+3,	yz_planes[10],	BACK},
 
 	/* eixo z */
-	{verts+0,	xy_planes[0],	FRONT},
-	{verts+1,	xy_planes[0],	FRONT},
-	{verts+2,	xy_planes[0],	FRONT},
-	{verts+3,	xy_planes[0],	FRONT},
+	{verts+0,	xy_planes[ 0],	FRONT},
+	{verts+1,	xy_planes[ 0],	FRONT},
+	{verts+2,	xy_planes[ 0],	FRONT},
+	{verts+3,	xy_planes[ 0],	FRONT},
 
-	{verts+0,	xy_planes[1],	ON_PLANE},
-	{verts+1,	xy_planes[1],	ON_PLANE},
-	{verts+2,	xy_planes[1],	ON_PLANE},
-	{verts+3,	xy_planes[1],	ON_PLANE},
+	{verts+0,	xy_planes[ 1],	ON_PLANE},
+	{verts+1,	xy_planes[ 1],	ON_PLANE},
+	{verts+2,	xy_planes[ 1],	ON_PLANE},
+	{verts+3,	xy_planes[ 1],	ON_PLANE},
 
-	{verts+0,	xy_planes[2],	BACK},
-	{verts+1,	xy_planes[2],	BACK},
-	{verts+2,	xy_planes[2],	BACK},
-	{verts+3,	xy_planes[2],	BACK},
+	{verts+0,	xy_planes[ 2],	BACK},
+	{verts+1,	xy_planes[ 2],	BACK},
+	{verts+2,	xy_planes[ 2],	BACK},
+	{verts+3,	xy_planes[ 2],	BACK},
 };
 #define N_EDGE_CMP_CASES (sizeof (edge_cmp_cases) / sizeof (struct edge_cmp_case))
 
@@ -245,18 +295,22 @@ static struct poly_cmp_case poly_cmp_cases[] =
 	/* poly		p		v1		v2		side */
 
 	/* eixo x */
-	{&quadrado,	yz_planes[0],	verts+3,	verts+3,	FRONT},
-	{&quadrado,	yz_planes[1],	verts+2,	verts+3,	ON_PLANE | FRONT},
-	{&quadrado,	yz_planes[2],	verts+1,	verts+2,	BACK | FRONT},
-	{&quadrado,	yz_planes[3],	verts+1,	verts+3,	ON_PLANE | BACK | FRONT},
-	{&quadrado,	yz_planes[4],	verts+0,	verts+3,	BACK | FRONT},
-	{&quadrado,	yz_planes[5],	verts+0,	verts+3,	ON_PLANE | BACK},
-	{&quadrado,	yz_planes[6],	verts+3,	verts+3,	BACK},
+	{&quadrado,	yz_planes[ 0],	verts+3,	verts+3,	FRONT},
+	{&quadrado,	yz_planes[ 1],	verts+2,	verts+3,	ON_PLANE | FRONT},
+	{&quadrado,	yz_planes[ 2],	verts+1,	verts+2,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 3],	verts+1,	verts+2,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 4],	verts+1,	verts+2,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 5],	verts+1,	verts+3,	ON_PLANE | BACK | FRONT},
+	{&quadrado,	yz_planes[ 6],	verts+0,	verts+3,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 7],	verts+0,	verts+3,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 8],	verts+0,	verts+3,	BACK | FRONT},
+	{&quadrado,	yz_planes[ 9],	verts+0,	verts+3,	ON_PLANE | BACK},
+	{&quadrado,	yz_planes[10],	verts+3,	verts+3,	BACK},
 
 	/* eixo z */
-	{&quadrado,	xy_planes[0],	verts+3,	verts+3,	FRONT},
-	{&quadrado,	xy_planes[1],	verts+0,	verts+1,	ON_PLANE},
-	{&quadrado,	xy_planes[2],	verts+3,	verts+3,	BACK},
+	{&quadrado,	xy_planes[ 0],	verts+3,	verts+3,	FRONT},
+	{&quadrado,	xy_planes[ 1],	verts+0,	verts+1,	ON_PLANE},
+	{&quadrado,	xy_planes[ 2],	verts+3,	verts+3,	BACK},
 };
 #define N_POLY_CMP_CASES (sizeof (poly_cmp_cases) / sizeof (struct poly_cmp_case))
 
@@ -294,40 +348,60 @@ static struct edge_split_case edge_split_cases[] =
 	/* v		p		split */
 
 	/* eixo x */
-	{verts+0,	yz_planes[0],	{0}},
-	{verts+1,	yz_planes[0],	{0}},
-	{verts+2,	yz_planes[0],	{0}},
-	{verts+3,	yz_planes[0],	{0}},
+	{verts+0,	yz_planes[ 0],	{0}},
+	{verts+1,	yz_planes[ 0],	{0}},
+	{verts+2,	yz_planes[ 0],	{0}},
+	{verts+3,	yz_planes[ 0],	{0}},
 
-	{verts+0,	yz_planes[1],	{0}},
-	{verts+1,	yz_planes[1],	{0}},
-	{verts+2,	yz_planes[1],	{0}},
-	{verts+3,	yz_planes[1],	{0}},
+	{verts+0,	yz_planes[ 1],	{0}},
+	{verts+1,	yz_planes[ 1],	{0}},
+	{verts+2,	yz_planes[ 1],	{0}},
+	{verts+3,	yz_planes[ 1],	{0}},
 
-	{verts+0,	yz_planes[2],	{0}},
-	{verts+1,	yz_planes[2],	{ -1,  1,  0}},
-	{verts+2,	yz_planes[2],	{ -1, -1,  0}},
-	{verts+3,	yz_planes[2],	{0}},
+	{verts+0,	yz_planes[ 2],	{0}},
+	{verts+1,	yz_planes[ 2],	{ -3,  1,  0}},
+	{verts+2,	yz_planes[ 2],	{ -3, -1,  0}},
+	{verts+3,	yz_planes[ 2],	{0}},
 
-	{verts+0,	yz_planes[3],	{0}},
-	{verts+1,	yz_planes[3],	{0}},
-	{verts+2,	yz_planes[3],	{0}},
-	{verts+3,	yz_planes[3],	{0}},
+	{verts+0,	yz_planes[ 3],	{0}},
+	{verts+1,	yz_planes[ 3],	{ -2,  2,  0}},
+	{verts+2,	yz_planes[ 3],	{ -2, -2,  0}},
+	{verts+3,	yz_planes[ 3],	{0}},
 
-	{verts+0,	yz_planes[4],	{ 1,  1,  0}},
-	{verts+1,	yz_planes[4],	{0}},
-	{verts+2,	yz_planes[4],	{0}},
-	{verts+3,	yz_planes[4],	{ 1, -1,  0}},
+	{verts+0,	yz_planes[ 4],	{0}},
+	{verts+1,	yz_planes[ 4],	{ -1,  3,  0}},
+	{verts+2,	yz_planes[ 4],	{ -1, -3,  0}},
+	{verts+3,	yz_planes[ 4],	{0}},
 
-	{verts+0,	yz_planes[5],	{0}},
-	{verts+1,	yz_planes[5],	{0}},
-	{verts+2,	yz_planes[5],	{0}},
-	{verts+3,	yz_planes[5],	{0}},
+	{verts+0,	yz_planes[ 5],	{0}},
+	{verts+1,	yz_planes[ 5],	{0}},
+	{verts+2,	yz_planes[ 5],	{0}},
+	{verts+3,	yz_planes[ 5],	{0}},
 
-	{verts+0,	yz_planes[5],	{0}},
-	{verts+1,	yz_planes[5],	{0}},
-	{verts+2,	yz_planes[5],	{0}},
-	{verts+3,	yz_planes[5],	{0}},
+	{verts+0,	yz_planes[ 6],	{ 1,  3,  0}},
+	{verts+1,	yz_planes[ 6],	{0}},
+	{verts+2,	yz_planes[ 6],	{0}},
+	{verts+3,	yz_planes[ 6],	{ 1, -3,  0}},
+
+	{verts+0,	yz_planes[ 7],	{ 2,  2,  0}},
+	{verts+1,	yz_planes[ 7],	{0}},
+	{verts+2,	yz_planes[ 7],	{0}},
+	{verts+3,	yz_planes[ 7],	{ 2, -2,  0}},
+
+	{verts+0,	yz_planes[ 8],	{ 3,  1,  0}},
+	{verts+1,	yz_planes[ 8],	{0}},
+	{verts+2,	yz_planes[ 8],	{0}},
+	{verts+3,	yz_planes[ 8],	{ 3, -1,  0}},
+
+	{verts+0,	yz_planes[ 9],	{0}},
+	{verts+1,	yz_planes[ 9],	{0}},
+	{verts+2,	yz_planes[ 9],	{0}},
+	{verts+3,	yz_planes[ 9],	{0}},
+
+	{verts+0,	yz_planes[10],	{0}},
+	{verts+1,	yz_planes[10],	{0}},
+	{verts+2,	yz_planes[10],	{0}},
+	{verts+3,	yz_planes[10],	{0}},
 
 	/* eixo z */
 	{verts+0,	xy_planes[0],	{0}},
@@ -352,7 +426,7 @@ static struct edge_split_case edge_split_cases[] =
 #define N_EDGE_SPLIT_CASES (sizeof (edge_split_cases) / sizeof (struct edge_split_case))
 
 #define assert_vec3_eq(a, b) ck_assert_msg( \
-		(a)[0] == (b)[0] && (a)[1] == (b)[1] && (a)[2] == (b)[2], \
+		!vec_cmp((a)[0], (b)[0]) && !vec_cmp((a)[1], (b)[1]) && !vec_cmp((a)[2], (b)[2]), \
 		"vectors " #a" and "#b" are different: {%f, %f, %f} and {%f, %f, %f}\n", \
 		a[0], a[1], a[2], b[0], b[1], b[2] \
 		)
@@ -426,45 +500,45 @@ static struct poly_split_case poly_split_cases[] =
 {
 	{
 		&quadrado,
-		yz_planes[2],
+		yz_planes[3],
 		{ 3,  5},
 		{
-			{-1,	 1,	 0},
-			{-2,	 0,	 0},
-			{-1,	-1,	 0},
-			{ 2,	 0,	 0},
-			{ 0,	 2,	 0},
-			{-1,	 1,	 0},
-			{-1,	-1,	 0},
-			{ 0,	-2,	 0},
+			{-2,	 2,	 0},
+			{-4,	 0,	 0},
+			{-2,	-2,	 0},
+			{ 4,	 0,	 0},
+			{ 0,	 4,	 0},
+			{-2,	 2,	 0},
+			{-2,	-2,	 0},
+			{ 0,	-4,	 0},
 		}
 	},
 	{
 		&quadrado,
-		yz_planes[3],
+		yz_planes[5],
 		{ 3,  3},
 		{
-			{ 0,	 2,	 0},
-			{-2,	 0,	 0},
-			{ 0,	-2,	 0},
-			{ 2,	 0,	 0},
-			{ 0,	 2,	 0},
-			{ 0,	-2,	 0},
+			{ 0,	 4,	 0},
+			{-4,	 0,	 0},
+			{ 0,	-4,	 0},
+			{ 4,	 0,	 0},
+			{ 0,	 4,	 0},
+			{ 0,	-4,	 0},
 		}
 	},
 	{
 		&quadrado,
-		yz_planes[4],
+		yz_planes[7],
 		{ 5,  3},
 		{
-			{ 1,	 1,	 0},
-			{ 0,	 2,	 0},
-			{-2,	 0,	 0},
-			{ 0,	-2,	 0},
-			{ 1,	-1,	 0},
-			{ 2,	 0,	 0},
-			{ 1,	 1,	 0},
-			{ 1,	-1,	 0},
+			{ 2,	 2,	 0},
+			{ 0,	 4,	 0},
+			{-4,	 0,	 0},
+			{ 0,	-4,	 0},
+			{ 2,	-2,	 0},
+			{ 4,	 0,	 0},
+			{ 2,	 2,	 0},
+			{ 2,	-2,	 0},
 		},
 	},
 };

@@ -48,7 +48,7 @@ struct beh_node* node_alloc()
  * pontua divisor
  *
  */
-static inline int split_score(struct poly* poly, const float* p)
+static inline int split_score(struct poly* list, const float* p)
 {
 	struct poly_cmp pc;
 	struct poly* cur;
@@ -57,7 +57,7 @@ static inline int split_score(struct poly* poly, const float* p)
 	back = 0;
 	front = 0;
 	split = 0;
-	for (cur = poly; cur; cur = cur->next)
+	for (cur = list; cur; cur = cur->next)
 	{
 		//p('t');
 		poly_cmp(&pc, cur, p);
@@ -77,16 +77,16 @@ static inline int split_score(struct poly* poly, const float* p)
  * encontra divisor com melhor (menor) pontuação
  *
  */
-static inline struct poly* best_splitter(struct poly* poly)
+static inline struct poly* best_splitter(struct poly* list)
 {
 	struct poly* cur, * best;
 	int score_best, score_cur;
 
-	assert (poly);
+	assert (list);
 
 	best = NULL;
 	score_best = INT_MAX;
-	for (cur = poly; cur; cur = cur->next)
+	for (cur = list; cur; cur = cur->next)
 	{
 		assert (cur->next != cur);
 		//p('x');
@@ -94,7 +94,7 @@ static inline struct poly* best_splitter(struct poly* poly)
 		if (cur->used)
 			continue;
 
-		score_cur = split_score(poly, cur->p);
+		score_cur = split_score(list, cur->p);
 
 		if (score_cur < score_best)
 		{
@@ -115,43 +115,44 @@ static inline void split_one_poly(struct poly* poly, const float* p, struct poly
 	struct poly_cmp pc;
 
 	assert (poly->next != poly);
+	assert (p[0] || p[1] || p[2]);
 
 	poly_cmp(&pc, poly, p);
 
 	parts[0] = NULL;
 	parts[1] = NULL;
 
+	switch (pc.side)
+	{
 	/* polígono exatamente no plano */
-	if (pc.side == ON_PLANE)
-	{
-		/* e apontando para o mesmo lado! */
-		if (0 < vec3_dot(poly->p, p))
-		{
-			poly->used = true;
+	case ON_PLANE:
+		poly->used = true;
+
+		/* apontando pro mesmo lado */
+		if (0 <= vec3_dot(poly->p, p))
 			parts[1] = poly;
-			return;
-		}
 
+		/* apontando pra trás */
 		else
-		{
 			parts[0] = poly;
-			return;
-		}
-	}
 
-	/* divide o polígono */
-	switch (pc.side & SPLIT)
-	{
+		break;
+
+	/* polígono dividido */
 	case SPLIT:
+	case ON_PLANE | SPLIT:
 		poly_split(&pc, parts+0, parts+1);
 		p('|');
 		break;
 
+	/* polígono atrás */
 	case BACK:
+	case ON_PLANE | BACK:
 		parts[0] = poly;
 		p('<');
 		break;
 
+	/* só sobrou a frente... eu acho... */
 	default:
 		parts[1] = poly;
 		p('>');
@@ -203,32 +204,34 @@ struct beh_node* behc_node(struct poly* list)
 	node = node_alloc();
 
 	/* uma folha sólida */
-	if (!list)
+	if (!list || !(best = best_splitter(list)))
 	{
-		p('S');
-		node->type = SOLID_LEAF;
-		return node;
-	}
-
-	best = best_splitter(list);
-
-	/* folha líquida e convexa */
-	if (!best)
-	{
-		p('L');
-		node->type = LIQUID_LEAF;
+		node->type = LEAF;
 		node->polys = list;
 		return node;
 	}
 
 	p('N');
 	vec4_copy(best->p, node->plane);
-	best->used = true;
 	split_polys(list, best->p, parts);
 
 	/* inception */
 	node->kids[0] = behc_node(parts[0]);
 	node->kids[1] = behc_node(parts[1]);
+
+	if (node->kids[0]->type == LEAF)
+	{
+		node->kids[0]->type = SOLID_LEAF;
+		p('S');
+		node->kids[0]->polys = NULL; /* FIXME: leaking */
+	}
+
+	if (node->kids[1]->type == LEAF)
+	{
+		node->kids[1]->type = LIQUID_LEAF;
+		p('L');
+	}
+
 	return node;
 }
 
@@ -312,8 +315,9 @@ static inline int count_tris(struct beh_node* node)
 		return 0;
 
 	n = 0;
-	for (cur = node->polys; cur; cur = cur->next)
-		n += cur->n_verts-2;
+	if (node->type == LIQUID_LEAF)
+		for (cur = node->polys; cur; cur = cur->next)
+			n += cur->n_verts-2;
 
 	n += count_tris(node->kids[0]);
 	n += count_tris(node->kids[1]);
@@ -347,8 +351,9 @@ static inline void put_node_tris(struct teh* teh, struct beh_node* node)
 
 	node->i[0] = teh->n_tris;
 
-	for (cur = node->polys; cur; cur = cur->next)
-		put_poly_tris(teh, cur);
+	if (node->type == LIQUID_LEAF)
+		for (cur = node->polys; cur; cur = cur->next)
+			put_poly_tris(teh, cur);
 
 	node->i[1] = teh->n_tris - node->i[0];
 

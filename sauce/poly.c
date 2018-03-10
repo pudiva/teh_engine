@@ -139,7 +139,7 @@ void edge_split_winding(struct edge_cmp* ec, struct vert** a, struct vert** b)
 	/* ta cada 1 de 1 lado */
 	else if ((ec->side & SPLIT) == SPLIT)
 	{
-		w = (ec->vc[1].h - ec->vc[1].p[3]) / (ec->vc[1].h - ec->vc[0].h);
+		w = (ec->vc[1].p[3] - ec->vc[0].h) / (ec->vc[1].h - ec->vc[0].h);
 		(*b) = vert_lerp(w, (*a), (*a)->next);
 		(*b)->next = ec->vc[1].v;
 		(*a)->next = vert_dup((*b));

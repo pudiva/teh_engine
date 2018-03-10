@@ -17,14 +17,22 @@ graph_t *g;
 static Agnode_t* graph_node(struct beh_node* n)
 {
 	Agnode_t* agn, * agn_b, * agn_f;
-	char name[16];
+	char name[32];
 
 	if (!n)
 		return NULL;
 
-	sprintf(name, "%ld: %c",
-			n - node_pool,
-			n->type & LEAF ? (n->type & SOLID_LEAF ? 'S' : 'L') : 'N');
+	switch (n->type)
+	{
+	case LEAF:
+		sprintf(name, "%ld: L (%d)", n - node_pool, n->i[1]);
+		break;
+	case SOLID_LEAF:
+		sprintf(name, "%ld: S", n - node_pool);
+		break;
+	default:
+		sprintf(name, "%ld: N", n - node_pool);
+	}
 
 	agn = agnode(g, name, 1);
 	agn_b = graph_node(n->kids[0]);

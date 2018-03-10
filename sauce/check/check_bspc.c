@@ -9,63 +9,65 @@
 #include "poly_pool.h"
 
 /*
- * triângulo isóceles circunscrito em circunferência de raio 1 com centro na
- * origem
+ * quadradão
  *
  */
-#define SIN 0.8660253882408142 /* satã */
-#define COS 0.5
-
-static struct vert verts[][3];
-static struct vert verts_orig[][3] =
+static struct vert verts[2][2][4];
+static struct vert verts_orig[2][2][4] =
 {
 	{
-		{{ 1,	 0,	 0},	{0}, {0}, verts[0]+1},
-		{{-COS,	 SIN,	 0},	{0}, {0}, verts[0]+2},
-		{{-COS,	-SIN,	 0},	{0}, {0}, verts[0]+0},
+		{
+			{{ 2,  0,  0}, {0}, {0}, verts[0][0] + 1},
+			{{ 0,  2,  0}, {0}, {0}, verts[0][0] + 2},
+			{{-2,  0,  0}, {0}, {0}, verts[0][0] + 3},
+			{{ 0, -2,  0}, {0}, {0}, verts[0][0] + 0},
+		},
+		{
+			{{ 2,  0,  1}, {0}, {0}, verts[0][1] + 1},
+			{{ 0,  2,  1}, {0}, {0}, verts[0][1] + 2},
+			{{-2,  0,  1}, {0}, {0}, verts[0][1] + 3},
+			{{ 0, -2,  1}, {0}, {0}, verts[0][1] + 0},
+		},
 	},
 	{
-		{{ 1,	 0,	 1},	{0}, {0}, verts[1]+1},
-		{{-COS,	 SIN,	 1},	{0}, {0}, verts[1]+2},
-		{{-COS,	-SIN,	 1},	{0}, {0}, verts[1]+0},
-	},
-	{
-		{{ 0,	 0,	 1},	{0}, {0}, verts[2]+1},
-		{{ SIN,	 0,	-COS},	{0}, {0}, verts[2]+2},
-		{{-SIN,	 0,	-COS},	{0}, {0}, verts[2]+0},
-	},
-	{
-		{{ 0,	 1,	 1},	{0}, {0}, verts[3]+1},
-		{{ SIN,	 1,	-COS},	{0}, {0}, verts[3]+2},
-		{{-SIN,	 1,	-COS},	{0}, {0}, verts[3]+0},
+		{
+			{{ 0,  0,  2}, {0}, {0}, verts[1][0] + 1},
+			{{ 0, -2,  0}, {0}, {0}, verts[1][0] + 2},
+			{{ 0,  0, -2}, {0}, {0}, verts[1][0] + 3},
+			{{ 0,  2,  0}, {0}, {0}, verts[1][0] + 0},
+		},
+		{
+			{{ 1,  0,  2}, {0}, {0}, verts[1][1] + 1},
+			{{ 1, -2,  0}, {0}, {0}, verts[1][1] + 2},
+			{{ 1,  0, -2}, {0}, {0}, verts[1][1] + 3},
+			{{ 1,  2,  0}, {0}, {0}, verts[1][1] + 0},
+		},
 	},
 };
 
-static struct poly tris_orig[][2] =
+static struct poly polys[2][2];
+static struct poly polys_orig[2][2] =
 {
 	{
-		{{ 0,  0,  1,  0}, 3, verts[0]},
-		{{ 0,  0,  1,  0}, 3, verts[1]},
+		{{ 0,  0,  1,  0}, 4, verts[0][0]},
+		{{ 0,  0,  1,  1}, 4, verts[0][1]},
 	},
 	{
-		{{ 0,  1,  0,  0}, 3, verts[2]},
-		{{ 0,  1,  0,  0}, 3, verts[3]},
+		{{ 1,  0,  0,  0}, 4, verts[1][0]},
+		{{ 1,  0,  0,  1}, 4, verts[1][1]},
 	},
 };
 
-static struct vert verts[sizeof (verts_orig)/sizeof (struct vert[3])][3];
-static struct poly tris[sizeof (tris_orig)/sizeof (struct poly[2])][2];
-
-static void setup_tris()
+static void setup_polys()
 {
-	memcpy(tris, tris_orig, sizeof (tris_orig));
+	memcpy(polys, polys_orig, sizeof (polys_orig));
 	memcpy(verts, verts_orig, sizeof (verts_orig));
 	memset(node_pool, 0, sizeof (node_pool));
 	node_pool_c = 0;
 };
 
 /*
- * combinações de triângulos e translações
+ * combinações de polígonos
  *
  */
 struct test_case
@@ -76,9 +78,9 @@ struct test_case
 
 struct test_case cases[] =
 {
-	{{tris[0]+0, tris[0]+1}, 5},
-	{{tris[1]+0, tris[1]+1}, 5},
-	{{tris[0]+0, tris[1]+1}, 7},
+	{{polys[0]+0, polys[0]+1}, 5},
+	{{polys[1]+0, polys[1]+1}, 5},
+	{{polys[0]+0, polys[1]+1}, 7},
 };
 #define N_CASES (sizeof (cases) / sizeof (struct test_case))
 
@@ -109,7 +111,7 @@ Suite* bspc_suite()
 	tc_isoceles = tcase_create("isoceles");
 
 	tcase_add_checked_fixture(tc_isoceles, poly_pool_init, NULL);
-	tcase_add_checked_fixture(tc_isoceles, setup_tris, NULL);
+	tcase_add_checked_fixture(tc_isoceles, setup_polys, NULL);
 
 	tcase_add_loop_test(tc_isoceles, test_bspc, 0, N_CASES);
 	suite_add_tcase(s, tc_isoceles);

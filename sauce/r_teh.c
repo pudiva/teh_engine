@@ -70,8 +70,22 @@ void r_teh(struct teh* x, float w, int f1, int f2, int off, int n)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0,
 			NULL + x->vbo_texcoords_off + off * sizeof (float[3][2]));
 
+	/* FIXME: moldura de fios */
+	static float c1[4] = {1, 1, 1, 1};
+	static float c2[4] = {0, 10, 0, 1};
+	int i;
+
+	r_color4fv(c1);
 	glDrawArrays(GL_TRIANGLES, 0, 3*n);
-	glDrawArrays(GL_LINES, 0, 3*n);
+
+	if (r_wireframe)
+	{
+		r_color4fv(c2);
+		//glLineWidth(2);
+		for (i = 0; i < n; ++i)
+			glDrawArrays(GL_LINE_LOOP, 3*i, 3);
+		r_color4fv(c1);
+	}
 }
 
 void r_teh_at_time(struct teh* x, unsigned long t)

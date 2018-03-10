@@ -5,6 +5,7 @@
 
 GLuint r_vertex_shader_id, r_fragment_shader_id, r_program_id;
 GLint r_pos_loc, r_color_loc, r_vertex_w_loc, r_modelview_loc, r_texture_sampler_loc;
+bool r_wireframe = false;
 
 static GLuint r_shader_init(GLenum type, const GLchar* sauce, GLint len)
 {
