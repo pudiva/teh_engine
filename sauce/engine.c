@@ -46,7 +46,7 @@ void fini()
  * fas o boneco olha com mouse
  *
  */
-static float c_look_angles[4] = {0};
+static float c_look_angles[4] = {3.14/2, 0, 0, 0};
 static bool c_look_mouse = false;
 
 static void c_look_mouse_toggle()
@@ -64,8 +64,8 @@ static void c_look_handle(SDL_Event* ev)
 		return;
 
 	c_look_angles[0] -= .01 * ev->motion.yrel;
-	c_look_angles[1] -= .01 * ev->motion.xrel;
-	c_look_angles[2]  = 0;
+	c_look_angles[1]  = 0;
+	c_look_angles[2] -= .01 * ev->motion.xrel;
 	c_look_angles[3]  = 0;
 }
 
@@ -98,8 +98,8 @@ static void c_walk_handle(SDL_Event* ev)
 	}
 
 	c_walk_dir[0] = c_walk_i[3] - c_walk_i[0];
-	c_walk_dir[1] = c_walk_i[4] - c_walk_i[5];
-	c_walk_dir[2] = c_walk_i[1] - c_walk_i[2];
+	c_walk_dir[1] = c_walk_i[2] - c_walk_i[1];
+	c_walk_dir[2] = c_walk_i[4] - c_walk_i[5];
 	c_walk_dir[3] = 0;
 	vec4_normalize(c_walk_dir);
 }
@@ -174,40 +174,33 @@ static void c_poll()
  * zoio
  *
  */
-static float c_eye_pos[4] = { 0,  0,  5,  1};
-static float c_eye_dir[4] = { 0,  0, -1,  0};
+static float c_eye_pos[4] = { 0, -5,  5,  1};
+static float c_eye_dir[4] = {0};
 
-static float c_eye_R_x[4][4] = {0}, c_eye_R_y[4][4] = {0}, c_eye_R_yx[4][4] = {0};
-static float c_eye_T[4][4] = {0}, c_eye_TR_y[4][4] = {0}, c_eye_TR_yx[4][4] = {0};
-static float c_eye_TR_yx_inv[4][4] = {0};
+static float c_eye_R[3][4][4] = {0};
+static float c_eye_T[4][4] = {0};
+static float c_eye_TR[4][4] = {0};
+static float c_eye_TR_inv[4][4] = {0};
 static float c_modelview[4][4] = {0};
 
-static float basis[4][4] =
-{
-	{ 1,  0,  0,  0},
-	{ 0,  0, -1,  0},
-	{ 0,  1,  0,  0},
-	{ 0,  0,  0,  1}
-};
+static float front[4] = {0, 1, 0, 0};
 
 static void look()
 {
 	float dt;
 
-	mat4_rotate_y(c_look_angles[1], c_eye_R_y);
-	mat4_rotate_x(c_look_angles[0], c_eye_R_x);
-	mat4_gemm(1, c_eye_R_y, c_eye_R_x, 0, c_eye_R_yx);
-	mat4_gemv(1, c_eye_R_yx, minusz4, 0, c_eye_dir);
+	mat4_rotate_x(c_look_angles[0], c_eye_R[0]);
+	mat4_rotate_z(c_look_angles[2], c_eye_R[1]);
+	mat4_gemm(1, c_eye_R[1], c_eye_R[0], 0, c_eye_R[2]);
+	mat4_gemv(1, c_eye_R[2], front, 0, c_eye_dir);
 
 	dt = ((float) window_dt)/1000;
-	mat4_gemv(5*dt, c_eye_R_y, c_walk_dir, 1, c_eye_pos);
+	mat4_gemv(5*dt, c_eye_R[1], c_walk_dir, 1, c_eye_pos);
 	mat4_translate(c_eye_pos, c_eye_T);
-	mat4_gemm(1, c_eye_T, c_eye_R_yx, 0, c_eye_TR_yx);
+	mat4_gemm(1, c_eye_T, c_eye_R[2], 0, c_eye_TR);
 
-	(void) c_eye_TR_y;
-
-	mat4_magic_inv(c_eye_TR_yx, c_eye_TR_yx_inv);
-	mat4_gemm(1, c_eye_TR_yx_inv, basis, 0, c_modelview);
+	mat4_magic_inv(c_eye_TR, c_eye_TR_inv);
+	mat4_gemm(1, c_eye_TR_inv, eye4, 0, c_modelview);
 }
 
 /*
@@ -222,43 +215,22 @@ static float T_igualopeople[4][4] =
 	{ 0,  0,  5,  1},
 };
 
-static float T_igualomapa[4][4] =
-{
-	{ 1,  0,  0,  0},
-	{ 0,  1,  0,  0},
-	{ 0,  0,  1,  0},
-	{ 0,  0,  0,  1},
-};
-
 void frame()
 {
 	float M[4][4] = {0};
+	float t;
 
 	glViewport(0, 0, window_w, window_h);
 
-	float t = ((float) (SDL_GetTicks() % 1000))/1000;
+	t = ((float) (SDL_GetTicks() % 1000))/1000;
 	r_clear(t * (178.0/255), t * (102.0/255), t * (131.0/255), 1);
 
 	look();
 
-	mat4_gemm(1, c_modelview, T_igualomapa, 0, M);
-	r_modelview(M[0]);
-
-	float basis_inv[4][4] =
-	{
-		{ 1,  0,  0,  0},
-		{ 0,  0,  1,  0},
-		{ 0, -1,  0,  0},
-		{ 0,  0,  0,  1}
-	};
-
-	float p[4] = {0};
-
-	mat4_gemv(1, basis_inv, c_eye_pos, 0, p);
-
+	r_modelview(c_modelview[0]);
 	if (full_beh)
 	{
-		r_beh_from_eye(igualomapa, p);
+		r_beh_from_eye(igualomapa, c_eye_pos);
 		break;
 	}
 
