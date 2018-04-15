@@ -2,11 +2,7 @@
 #define HAS_POLY_H
 
 #include <stdbool.h>
-
-/*
- * PISCINA DE POLÍGONOS!!1!1ONE!
- *
- */
+#include "pool.h"
 
 /* classificação de lado */
 enum side
@@ -64,16 +60,43 @@ struct poly_cmp
 	enum side side;		/* lado(s) do plano nos quais o polígono está */
 };
 
+/*
+ * PISCINA DE POLÍGONOS!!1!1ONE!
+ *
+ */
+#define POLY_POOL_BUF_LEN 66666
+#define VERT_POOL_BUF_LEN (3 * POLY_POOL_BUF_LEN)
+
+extern struct vert vert_pool_buf[VERT_POOL_BUF_LEN];
+extern struct poly poly_pool_buf[POLY_POOL_BUF_LEN];
+
+extern struct pool vert_pool;
+extern struct pool poly_pool;
+
+#define vert_alloc() pool_alloc(&vert_pool)
+#define vert_free(x) pool_free(&vert_pool, (x))
+#define vert_pool_init() pool_init(&vert_pool, VERT_POOL_BUF_LEN, sizeof (struct vert), vert_pool_buf)
+#define vert_pool_fini() pool_free(&vert_pool)
+
+#define poly_alloc() pool_alloc(&poly_pool)
+#define poly_free(x) pool_free(&poly_pool, (x))
+#define poly_pool_init() pool_init(&poly_pool, POLY_POOL_BUF_LEN, sizeof (struct poly), poly_pool_buf)
+#define poly_pool_fini() pool_fini(&poly_pool)
+
+/* comparação */
 void vert_cmp(struct vert_cmp* vc, struct vert* v, const float* p);
 void edge_cmp_next(struct edge_cmp* ec);
 void edge_cmp(struct edge_cmp* ec, struct vert* v, const float* p);
 void poly_cmp(struct poly_cmp* pc, struct poly* poly, const float* p);
 
+/* duplicação */
 struct vert* vert_dup(struct vert* v);
 struct poly* poly_dup(struct poly* poly);
 
+/* interpolação */
 struct vert* vert_lerp(float w, struct vert* a, struct vert* b);
 
+/* divisão por plano */
 void edge_split_winding(struct edge_cmp* ec, struct vert** a, struct vert** b);
 void poly_split_winding(struct poly_cmp* pc, struct poly** a, struct poly** b);
 

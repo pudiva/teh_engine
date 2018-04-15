@@ -6,7 +6,6 @@
 #include "bspc.h"
 #include "vec.h"
 #include "assets.h"
-#include "poly_pool.h"
 
 struct beh_node* root;
 
@@ -83,6 +82,7 @@ int main(int argc, char *argv[])
 	assert (0 < model->n_tris);
 	assert (0 < model->n_frames);
 
+	vert_pool_init();
 	poly_pool_init();
 	bsp = behc(model);
 	assert (bsp);

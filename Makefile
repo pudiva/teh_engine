@@ -48,7 +48,6 @@ LIB_OBJS := \
 	build/assets.o \
 	build/beh.o \
 	build/poly.o \
-	build/poly_pool.o \
 	build/pool.o \
 
 GUI_OBJS := \
@@ -69,7 +68,6 @@ CHECK_OBJS := \
 	build/check/check_poly.o \
 	build/check/check_tri_split.o \
 	build/check/check_bspc.o \
-	build/check/check_poly_pool.o \
 	build/check/check_pool.o \
 
 OBJS := \

@@ -2,7 +2,16 @@
 #include <stddef.h>
 #include "poly.h"
 #include "vec.h"
-#include "poly_pool.h"
+
+/*
+ * PISCINA DE POLÍGONOS!!1!1ONE!
+ *
+ */
+struct vert vert_pool_buf[VERT_POOL_BUF_LEN];
+struct poly poly_pool_buf[POLY_POOL_BUF_LEN];
+
+struct pool vert_pool;
+struct pool poly_pool;
 
 /*
  * cmp

@@ -24,7 +24,6 @@
 #define p(c) ((void)0);
 #endif
 
-#include "poly_pool.h"
 #include "poly.h"
 #include "bspc.h"
 #include "vec.h"

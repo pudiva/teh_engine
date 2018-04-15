@@ -6,7 +6,6 @@
 
 #include "bspc.h"
 #include "vec.h"
-#include "poly_pool.h"
 
 /*
  * quadradão
@@ -101,6 +100,13 @@ START_TEST(test_bspc)
 }
 END_TEST
 
+static void setup_pools()
+{
+	/* NOTE: issos são macros, por isso uma função em volta */
+	vert_pool_init();
+	poly_pool_init();
+}
+
 /* teeeeeste */
 Suite* bspc_suite()
 {
@@ -110,7 +116,7 @@ Suite* bspc_suite()
 	s = suite_create("bspc");
 	tc_isoceles = tcase_create("isoceles");
 
-	tcase_add_checked_fixture(tc_isoceles, poly_pool_init, NULL);
+	tcase_add_checked_fixture(tc_isoceles, setup_pools, NULL);
 	tcase_add_checked_fixture(tc_isoceles, setup_polys, NULL);
 
 	tcase_add_loop_test(tc_isoceles, test_bspc, 0, N_CASES);

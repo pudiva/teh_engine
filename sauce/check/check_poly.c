@@ -4,7 +4,6 @@
 
 #include "vec.h"
 #include "poly.h"
-#include "poly_pool.h"
 
 /*
  * planos de divisão
@@ -569,6 +568,13 @@ START_TEST(test_poly_split)
 }
 END_TEST
 
+static void setup_pools()
+{
+	/* NOTE: issos são macros, por isso uma função em volta */
+	vert_pool_init();
+	poly_pool_init();
+}
+
 /* teeeeeste */
 Suite* poly_suite()
 {
@@ -579,7 +585,7 @@ Suite* poly_suite()
 	tc_isoceles = tcase_create("quadrado");
 	tcase_add_checked_fixture(tc_isoceles, setup_quadrado, NULL);
 
-	tcase_add_unchecked_fixture(tc_isoceles, poly_pool_init, NULL);
+	tcase_add_unchecked_fixture(tc_isoceles, setup_pools, NULL);
 	tcase_add_loop_test(tc_isoceles, test_vert_cmp, 0, N_VERT_CMP_CASES);
 	tcase_add_loop_test(tc_isoceles, test_edge_cmp, 0, N_EDGE_CMP_CASES);
 	tcase_add_loop_test(tc_isoceles, test_poly_cmp, 0, N_POLY_CMP_CASES);
