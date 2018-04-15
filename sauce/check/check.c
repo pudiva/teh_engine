@@ -4,6 +4,7 @@ Suite* poly_pool_suite();
 Suite* poly_suite();
 Suite* tri_split_suite();
 Suite* bspc_suite();
+Suite* pool_suite();
 
 int main(int argc, char* argv[])
 {
@@ -14,6 +15,7 @@ int main(int argc, char* argv[])
 	srunner_add_suite(sr, poly_pool_suite());
 	srunner_add_suite(sr, poly_suite());
 	srunner_add_suite(sr, bspc_suite());
+	srunner_add_suite(sr, pool_suite());
 
 	srunner_run_all(sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed(sr);
