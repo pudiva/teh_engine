@@ -118,6 +118,9 @@ ALL_FILES := \
 all: $(PRGS)
 
 clean:
+	rm -f $(SHADERS) $(OBJS) $(PRGS)
+
+clean_all:
 	rm -f $(ALL_FILES)
 
 check: build/check/check
