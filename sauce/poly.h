@@ -73,11 +73,13 @@ extern struct poly poly_pool_buf[POLY_POOL_BUF_LEN];
 extern struct pool vert_pool;
 extern struct pool poly_pool;
 
+#define vert_pool_clear() pool_clear(&vert_pool)
 #define vert_alloc() pool_alloc(&vert_pool)
 #define vert_free(x) pool_free(&vert_pool, (x))
 #define vert_pool_init() pool_init(&vert_pool, VERT_POOL_BUF_LEN, sizeof (struct vert), vert_pool_buf)
 #define vert_pool_fini() pool_free(&vert_pool)
 
+#define poly_pool_clear() pool_clear(&poly_pool)
 #define poly_alloc() pool_alloc(&poly_pool)
 #define poly_free(x) pool_free(&poly_pool, (x))
 #define poly_pool_init() pool_init(&poly_pool, POLY_POOL_BUF_LEN, sizeof (struct poly), poly_pool_buf)
