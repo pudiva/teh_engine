@@ -8,12 +8,16 @@
  * piscina de nodos jajajajaj
  *
  */
-#define BSPC_NODE_POOL_LEN 66666
+#define BEH_NODE_POOL_BUF_LEN 66666
 
-extern struct beh_node node_pool[BSPC_NODE_POOL_LEN];
-extern int node_pool_c;
+extern struct beh_node beh_node_pool_buf[BEH_NODE_POOL_BUF_LEN];
+extern struct pool beh_node_pool;
 
-struct beh_node* node_alloc();
+#define beh_node_pool_clear() pool_clear(&beh_node_pool)
+#define beh_node_alloc() pool_alloc(&beh_node_pool)
+#define beh_node_free(x) pool_free(&beh_node_pool, (x))
+#define beh_node_pool_init() pool_init(&beh_node_pool, BEH_NODE_POOL_BUF_LEN, sizeof (struct beh_node), beh_node_pool_buf)
+#define beh_node_pool_fini() pool_free(&beh_node_pool)
 
 struct beh_node* behc_node(struct poly* list);
 struct beh* node_pool_to_beh();

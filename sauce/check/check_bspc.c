@@ -61,8 +61,6 @@ static void setup_polys()
 {
 	memcpy(polys, polys_orig, sizeof (polys_orig));
 	memcpy(verts, verts_orig, sizeof (verts_orig));
-	memset(node_pool, 0, sizeof (node_pool));
-	node_pool_c = 0;
 };
 
 /*
@@ -96,7 +94,7 @@ START_TEST(test_bspc)
 
 	behc_node(tc->x[0]);
 	//fputs("\n", stderr);
-	ck_assert_int_eq(node_pool_c, tc->n);
+	ck_assert_int_eq(beh_node_pool.n_used, tc->n);
 }
 END_TEST
 
@@ -105,6 +103,7 @@ static void setup_pools()
 	/* NOTE: issos são macros, por isso uma função em volta */
 	vert_pool_init();
 	poly_pool_init();
+	beh_node_pool_init();
 }
 
 /* teeeeeste */

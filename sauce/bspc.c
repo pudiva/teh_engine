@@ -33,15 +33,8 @@
  * piscina de nodos
  *
  */
-struct beh_node node_pool[BSPC_NODE_POOL_LEN] = {0};
-int node_pool_c = 0;
-
-struct beh_node* node_alloc()
-{
-	assert (node_pool_c < BSPC_NODE_POOL_LEN);
-	memset(&node_pool[node_pool_c], 0, sizeof (struct beh_node));
-	return &node_pool[node_pool_c++];
-}
+struct beh_node beh_node_pool_buf[BEH_NODE_POOL_BUF_LEN] = {0};
+struct pool beh_node_pool;
 
 /*
  * pontua divisor
@@ -200,7 +193,7 @@ struct beh_node* behc_node(struct poly* list)
 	struct beh_node* node;
 
 	p('+');
-	node = node_alloc();
+	node = beh_node_alloc();
 
 	/* uma folha sólida */
 	if (!list || !(best = best_splitter(list)))
@@ -295,6 +288,8 @@ struct beh_node* bspc_teh(struct teh* model)
 	list = poly_from_teh(model);
 	assert (list);
 
+	beh_node_pool_clear();
+
 	node = behc_node(list);
 	assert (node);
 
@@ -367,17 +362,17 @@ struct beh* node_pool_to_beh()
 
 	bsp = calloc(1, sizeof (struct beh));
 
-	n_tris = count_tris(node_pool+0);
+	n_tris = count_tris(beh_node_pool_buf+0);
 	bsp->model.tris = calloc(n_tris, sizeof (float[3][3]));
 	bsp->model.texcoords = calloc(n_tris, sizeof (float[3][2]));
 
-	put_node_tris(&bsp->model, node_pool+0);
+	put_node_tris(&bsp->model, beh_node_pool_buf+0);
 	assert (bsp->model.n_tris == n_tris);
 
 	bsp->model.n_frames = 1;
 
-	bsp->n_nodes = node_pool_c;
-	bsp->nodes = node_pool;
+	bsp->n_nodes = beh_node_pool.n_used;
+	bsp->nodes = beh_node_pool_buf;
 	return bsp;
 }
 
@@ -389,6 +384,8 @@ struct beh* behc(struct teh* model)
 {
 	struct beh_node* root;
 	struct beh* bsp;
+
+	beh_node_pool_init();
 
 	root = bspc_teh(model);
 	assert (root);
