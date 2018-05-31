@@ -293,6 +293,36 @@ void mat4_translate(const float* x, float (*A)[4])
 }
 
 /*
+ * gera matrizes de espixação
+ *
+ */
+void mat4_scale(const float* x, float (*A)[4])
+{
+	A[0][0] =  x[0]; A[1][0] =  0   ; A[2][0] =  0   ; A[3][0] =  0   ;
+	A[0][1] =  0   ; A[1][1] =  x[1]; A[2][1] =  0   ; A[3][1] =  0   ;
+	A[0][2] =  0   ; A[1][2] =  0   ; A[2][2] =  x[2]; A[3][2] =  0   ;
+	A[0][3] =  0   ; A[1][3] =  0   ; A[2][3] =  0   ; A[3][3] =  1   ;
+}
+
+/*
+ * gera matriz de zoiação
+ *
+ */
+void mat4_look_from(const float* pos, const float* front, const float* up, float (*A)[4])
+{
+	float M[4][4];
+	memset(M, 0, sizeof (float[4][4]));
+
+	vec3_copy(up, M[1]);		/* eixo y */
+	vec3_axpy(-1, front, M[2]);	/* eixo z */
+	vec3_cross(M[1], M[2], M[0]);	/* eixo x */
+	vec3_copy(pos, M[3]);		/* translação */
+	M[3][3] =  1;			/* divisor */
+
+	mat4_magic_inv(M, A);
+}
+
+/*
  * transpõe matriz
  *
  */

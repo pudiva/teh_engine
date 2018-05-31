@@ -100,6 +100,18 @@ void mat4_rotate_z(float a, float (*A)[4]);
 void mat4_translate(const float* x, float (*A)[4]);
 
 /*
+ * gera matrizes de espixação
+ *
+ */
+void mat4_scale(const float* x, float (*A)[4]);
+
+/*
+ * gera matriz de zoiação
+ *
+ */
+void mat4_look_from(const float* pos, const float* dir, const float* up, float (*A)[4]);
+
+/*
  * transpõe matriz
  *
  */
