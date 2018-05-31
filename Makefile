@@ -70,6 +70,7 @@ CHECK_OBJS := \
 	build/check/check_tri_split.o \
 	build/check/check_bspc.o \
 	build/check/check_pool.o \
+	build/check/check_box.o \
 
 OBJS := \
 	$(LIB_OBJS) \
