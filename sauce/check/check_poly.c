@@ -5,6 +5,8 @@
 #include "vec.h"
 #include "poly.h"
 
+#include "relp.h"
+
 /*
  * planos de divisão
  *
@@ -423,14 +425,6 @@ static struct edge_split_case edge_split_cases[] =
 };
 
 #define N_EDGE_SPLIT_CASES (sizeof (edge_split_cases) / sizeof (struct edge_split_case))
-
-#define assert_vec3_eq(a, b) ck_assert_msg( \
-		!vec_cmp((a)[0], (b)[0]) && !vec_cmp((a)[1], (b)[1]) && !vec_cmp((a)[2], (b)[2]), \
-		"vectors " #a" and "#b" are different: {%f, %f, %f} and {%f, %f, %f}\n", \
-		a[0], a[1], a[2], b[0], b[1], b[2] \
-		)
-
-#include <stdio.h>
 
 /* testa as parada */
 START_TEST(test_edge_split)
