@@ -35,7 +35,5 @@ static inline void draw_node(struct beh* bsp, struct beh_node* n, const float* e
 
 void r_beh_from_eye(struct beh* bsp, const float* eye)
 {
-	glDisable(GL_DEPTH_TEST);
 	draw_node(bsp, bsp->nodes, eye);
-	glEnable(GL_DEPTH_TEST);
 }

@@ -31,7 +31,7 @@ void init()
 	igualopeople = teh_get("igualopeople.teh");
 	assert (igualopeople);
 
-	igualomapa = beh_get("igualomapa.beh");
+	igualomapa = beh_get("blorl.beh");
 	assert (igualomapa);
 
 	teh_boxxy = teh_get("boxxy.teh");
@@ -253,6 +253,10 @@ void frame()
 
 	look_and_move();
 
+	glClearDepthf(1);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
+
 	r_modelview(c_modelview[0]);
 	if (full_beh)
 	{
@@ -265,6 +269,8 @@ void frame()
 		r_teh(&igualomapa->model, 0, 0, 0, igualomapa->nodes[i_node].i[0], igualomapa->nodes[i_node].i[1]);
 		break;
 	}
+
+	glDepthFunc(GL_LESS);
 
 	mat4_gemm(1, c_modelview, T_igualopeople, 0, M);
 	r_modelview(M[0]);
