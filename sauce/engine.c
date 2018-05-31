@@ -16,11 +16,15 @@
 #include "r_beh.h"
 #include "vec.h"
 
+#include "box.h"
+
 /* otimização do ramon */
 #define if while
 
 struct teh* igualopeople;
+struct teh* teh_boxxy;
 struct beh* igualomapa;
+struct box* boxxy;
 
 void init()
 {
@@ -30,12 +34,24 @@ void init()
 	igualomapa = beh_get("igualomapa.beh");
 	assert (igualomapa);
 
+	teh_boxxy = teh_get("boxxy.teh");
+	assert (teh_boxxy);
+
 	igualopeople->texture = image_get("textures/igualopeople.png");
 	igualomapa->model.texture = image_get("textures/igualopeople.png");
+	teh_boxxy->texture = image_get("textures/boxxy.png");
+	assert (teh_boxxy->texture);
 	assert (igualopeople->texture);
 
 	r_teh_load_all(igualopeople);
 	r_teh_load_all(&igualomapa->model);
+	r_teh_load_all(teh_boxxy);
+
+	box_pool_init();
+
+	float boxxy_size[3] = {3, 4, 5};
+	float boxxy_pos[3] = {0, 0, 0};
+	boxxy = box_new(boxxy_pos, boxxy_size);
 }
 
 void fini()
@@ -46,7 +62,7 @@ void fini()
  * fas o boneco olha com mouse
  *
  */
-static float c_look_angles[4] = {3.14/2, 0, 0, 0};
+static float c_look_angles[4] = {-3.14/2, 0, 0, 0};
 static bool c_look_mouse = false;
 
 static void c_look_mouse_toggle()
@@ -63,9 +79,9 @@ static void c_look_handle(SDL_Event* ev)
 	if (ev->type != SDL_MOUSEMOTION)
 		return;
 
-	c_look_angles[0] -= .01 * ev->motion.yrel;
+	c_look_angles[0] += .01 * ev->motion.yrel;
 	c_look_angles[1]  = 0;
-	c_look_angles[2] -= .01 * ev->motion.xrel;
+	c_look_angles[2] += .01 * ev->motion.xrel;
 	c_look_angles[3]  = 0;
 }
 
@@ -175,32 +191,41 @@ static void c_poll()
  *
  */
 static float c_eye_pos[4] = { 0, -5,  5,  1};
-static float c_eye_dir[4] = {0};
+static float c_eye_front[4] = {0};
+static float c_eye_up[4] = {0};
 
-static float c_eye_R[3][4][4] = {0};
-static float c_eye_T[4][4] = {0};
-static float c_eye_TR[4][4] = {0};
-static float c_eye_TR_inv[4][4] = {0};
 static float c_modelview[4][4] = {0};
 
-static float front[4] = {0, 1, 0, 0};
-
-static void look()
+/*
+ * movimentum
+ *
+ */
+static void look_and_move()
 {
 	float dt;
 
-	mat4_rotate_x(c_look_angles[0], c_eye_R[0]);
-	mat4_rotate_z(c_look_angles[2], c_eye_R[1]);
-	mat4_gemm(1, c_eye_R[1], c_eye_R[0], 0, c_eye_R[2]);
-	mat4_gemv(1, c_eye_R[2], front, 0, c_eye_dir);
+	float rot_x[4][4], rot_z[4][4], rot_zx[4][4];
+	float front[4] = {0, 0, -1, 0};
+	float up[4] = {0, 1, 0, 0};
 
+	/* rotação do zoio */
+	mat4_rotate_z(-c_look_angles[2], rot_z);
+	mat4_rotate_x(-c_look_angles[0], rot_x);
+	mat4_gemm(1, rot_z, rot_x, 0, rot_zx);
+
+	/* frente e cima do zoio */
+	mat4_gemv(1, rot_zx, front, 0, c_eye_front);
+	mat4_gemv(1, rot_zx, up, 0, c_eye_up);
+
+	/* move a caixa */
 	dt = ((float) window_dt)/1000;
-	mat4_gemv(5*dt, c_eye_R[1], c_walk_dir, 1, c_eye_pos);
-	mat4_translate(c_eye_pos, c_eye_T);
-	mat4_gemm(1, c_eye_T, c_eye_R[2], 0, c_eye_TR);
+	mat4_gemv(5*dt, rot_z, c_walk_dir, 1, boxxy->pos);
 
-	mat4_magic_inv(c_eye_TR, c_eye_TR_inv);
-	mat4_gemm(1, c_eye_TR_inv, eye4, 0, c_modelview);
+	/* move o zoio */
+	vec3_copy(boxxy->pos, c_eye_pos);
+	vec3_axpy(-5, c_eye_front, c_eye_pos);
+
+	mat4_look_from(c_eye_pos, c_eye_front, c_eye_up, c_modelview);
 }
 
 /*
@@ -218,6 +243,7 @@ static float T_igualopeople[4][4] =
 void frame()
 {
 	float M[4][4] = {0};
+	float T_boxxy[4][4] = {0}, S_boxxy[4][4] = {0}, TS_boxxy[4][4] = {0};
 	float t;
 
 	glViewport(0, 0, window_w, window_h);
@@ -225,7 +251,7 @@ void frame()
 	t = ((float) (SDL_GetTicks() % 1000))/1000;
 	r_clear(t * (178.0/255), t * (102.0/255), t * (131.0/255), 1);
 
-	look();
+	look_and_move();
 
 	r_modelview(c_modelview[0]);
 	if (full_beh)
@@ -240,10 +266,18 @@ void frame()
 		break;
 	}
 
-
 	mat4_gemm(1, c_modelview, T_igualopeople, 0, M);
 	r_modelview(M[0]);
 	r_teh_at_time(igualopeople, SDL_GetTicks());
+
+	mat4_translate(boxxy->pos, T_boxxy);
+	mat4_scale(boxxy->size, S_boxxy);
+
+	mat4_gemm(1, T_boxxy, S_boxxy, 0, TS_boxxy);
+	mat4_gemm(1, c_modelview, TS_boxxy, 0, M);
+
+	r_modelview(M[0]);
+	r_teh_at_time(teh_boxxy, 1);
 }
 
 int main(int argc, char *argv[])

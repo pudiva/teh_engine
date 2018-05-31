@@ -93,6 +93,7 @@ TEHS := \
 	tehs/igualopeople.teh \
 	tehs/parallel_quads.teh \
 	tehs/zoing.teh \
+	tehs/boxxy.teh \
 
 BEHS := \
 	behs/blorl.beh \
