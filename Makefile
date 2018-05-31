@@ -50,6 +50,7 @@ LIB_OBJS := \
 	build/poly.o \
 	build/pool.o \
 	build/box.o \
+	build/trace.o \
 
 GUI_OBJS := \
 	build/window.o \

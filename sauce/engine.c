@@ -18,6 +18,8 @@
 
 #include "box.h"
 
+#include "trace.h"
+
 /* otimização do ramon */
 #define if while
 
@@ -49,8 +51,8 @@ void init()
 
 	box_pool_init();
 
-	float boxxy_size[3] = {3, 4, 5};
-	float boxxy_pos[3] = {0, 0, 0};
+	float boxxy_size[3] = {1, 1, 1};
+	float boxxy_pos[3] = {0, -5, 0};
 	boxxy = box_new(boxxy_pos, boxxy_size);
 }
 
@@ -203,6 +205,16 @@ static float c_modelview[4][4] = {0};
 static void look_and_move()
 {
 	float dt;
+	float dp[4] = {0, 0, 0, 1};
+	struct trace trace =
+	{
+		boxxy,
+		{0, 0, 0},
+		0, 1,
+		0,
+		0,
+		NULL
+	};
 
 	float rot_x[4][4], rot_z[4][4], rot_zx[4][4];
 	float front[4] = {0, 0, -1, 0};
@@ -219,7 +231,15 @@ static void look_and_move()
 
 	/* move a caixa */
 	dt = ((float) window_dt)/1000;
-	mat4_gemv(5*dt, rot_z, c_walk_dir, 1, boxxy->pos);
+	mat4_gemv(5*dt, rot_z, c_walk_dir, 0, dp);
+
+	vec3_copy(dp, trace.v);
+	tr_beh(&trace, igualomapa);
+
+	printf("trace: t, t_best = %f, %f\n", trace.t, trace.t_best);
+
+	//vec4_axpy(trace.t_best, trace.v, boxxy->pos);
+	vec4_axpy(1, dp, boxxy->pos);
 
 	/* move o zoio */
 	vec3_copy(boxxy->pos, c_eye_pos);
