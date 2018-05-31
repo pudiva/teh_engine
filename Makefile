@@ -49,6 +49,7 @@ LIB_OBJS := \
 	build/beh.o \
 	build/poly.o \
 	build/pool.o \
+	build/box.o \
 
 GUI_OBJS := \
 	build/window.o \
