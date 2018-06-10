@@ -44,7 +44,7 @@ Digite:
 
     make check
 
-reze, aperte enter.
+aperte enter e começe a rezar.
 
 
 Executar
